@@ -1,6 +1,7 @@
 #include "Title.h"
 #include "Game.h"
 #include "TestSceneUeyama.h"
+#include "TestSceneKoga.h"
 
 #include "DxLib.h"
 
@@ -42,7 +43,7 @@ SceneBase* Title::Update()
 	}*/
 	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
 	{
-		return new TestSceneUeyama;
+		return new Game;
 	}
 	return this;
 }

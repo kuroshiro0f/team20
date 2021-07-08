@@ -3,8 +3,8 @@
 #include "TestSceneKoga.h"
 
 // 静的定数.
-//const int Target::m_target_X = 400;
-const int Target::m_target_X = 0;
+const int Target::m_target_X = 400;
+//const int Target::m_target_X = 0;
 const int Target::m_target_Y = 10;
 const int Target::m_target_Z = 0;
 const float Target::m_target_accel = 0.1f;
@@ -48,7 +48,7 @@ void Target::Update()
 	//	アイス射出フラグがtrueになったら
 	if (m_isShot)
 	{
-		//accelVec = VScale(dir, m_target_accel);
+		accelVec = VScale(dir, m_target_accel);
 		if (pos.x < -500 || pos.x > 500)
 		{
 			accelVec = VGet(0, 0, 0);
