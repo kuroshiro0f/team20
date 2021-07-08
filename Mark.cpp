@@ -2,7 +2,7 @@
 
 const int MARK_X = 0;
 const int MARK_Y = 0;
-const int MARK_Z = 100;
+const int MARK_Z = 0;
 
 Mark::Mark()
 	: m_modelHandle(-1)

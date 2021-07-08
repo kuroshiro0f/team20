@@ -7,6 +7,7 @@
 #include "SceneMgr.h"
 #include "Title.h"
 #include "TestSceneUeyama.h"
+#include "TestScene_fujihara.h"
 
 //-----------------------------------------------------------------------------
 // @brief  メイン関数.
@@ -28,7 +29,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SceneMgr* Scene = new SceneMgr;
 
 	//	タイトルシーンをセット
-	Scene->SetScene(new Title);
+	//Scene->SetScene(new Title);
+
+	//  自分用テストタイトルシーンをセット
+	Scene->SetScene(new TestScene_fujihara);
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
