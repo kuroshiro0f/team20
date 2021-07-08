@@ -11,6 +11,7 @@ public:
 
 	void Update();		//	更新
 	void Draw();		//	描画
+	void Sound();		//　音楽
 
 	void SetScene(class SceneBase* _Scene);		//	set関数（初期化の時にしか使わない）（引数に名前をつけるときは最初にアンダーバーを入れる）（要調査）				
 

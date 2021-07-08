@@ -171,6 +171,7 @@
     <ClCompile Include="ObstructStatic.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Result.cpp" />
+    <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMgr.cpp" />
     <ClCompile Include="Target.cpp" />
     <ClCompile Include="TestSceneKoga.cpp" />

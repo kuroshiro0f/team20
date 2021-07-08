@@ -52,7 +52,7 @@
     <ClCompile Include="TestSceneUeyama.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="TestSceneKoga.cpp">
+    <ClCompile Include="SceneBase.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -100,9 +100,6 @@
       <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="TestSceneUeyama.h">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="TestSceneKoga.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>

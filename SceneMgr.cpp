@@ -32,6 +32,11 @@ void SceneMgr::Draw()
 	m_scene->Draw();		//	ƒV[ƒ“‚ğ•`‰æ
 }
 
+void SceneMgr::Sound()
+{
+	m_scene->Sound();		//	BGM‚ğ—¬‚·
+}
+
 void SceneMgr::SetScene(SceneBase* _Scene)
 {
 	if (m_scene != nullptr)	//	m_Scene‚ª‹ó‚Å‚Í‚È‚¢ê‡

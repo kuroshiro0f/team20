@@ -40,6 +40,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// 描画処理
 		Scene->Draw();
 
+		// BGM処理
+		Scene->Sound();
+
 		// 裏画面の内容を表画面に反映させる
 		ScreenFlip();
 
