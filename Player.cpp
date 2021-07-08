@@ -8,6 +8,9 @@
 // 静的定数.
 const float Player::ACCEL				= 0.3f;		// 通常の加速.
 
+//
+int Player::m_sHandle;
+
 //const float Player::ACCEL = 0.03f;		// 通常の加速.
 const float Player::MAX_SPEED			= 0.8f;			// 最高速度.
 const float Player::DEFAULT_DECEL		= -0.01f;		// なにもしない時の減速.
@@ -23,11 +26,14 @@ Player::Player()
 	: modelHandle(-1)
 	 , hitRadius(5.0f)
 {
+	// サウンドの読み込み
+	m_sHandle = LoadSoundMem("C:/Users/co2cr/Desktop/model_program/team_prodauction(ver.4.1)/17.MyDxLibGame3D(hit)/data/sound/player/魔王魂 効果音 落ちる02.wav");
+
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/sara/sara.pmx");
 
 	// posはVector型なので、VGetで原点にセット
-	pos = VGet(0, 10, -100);
+	pos = VGet(0, 0, -100);
 	// 移動する力を（すべての座標）ゼロにする
 	velocity = VGet(0, 0, 0);
 	// 
@@ -59,6 +65,7 @@ void Player::Update()
 	// キーが押されておらず、かつキーが押されたら
 	if (Key&&!KeyPush)
 	{
+		PlaySoundMem(m_sHandle, DX_PLAYTYPE_BACK);
 		KeyPush = true;
 	}
 
@@ -73,7 +80,7 @@ void Player::Update()
 		// キーが押されていない状態にする
 		KeyPush = false;
 		// posを原点にセット
-		pos = VGet(0, 10, -100);
+		pos = VGet(0, 0, -100);
 		// 移動する力を（すべての方向）ゼロにする
 		velocity = VGet(0, 0, 0);
 	}
@@ -133,6 +140,8 @@ void Player::Update()
 //-----------------------------------------------------------------------------
 void Player::Draw()
 {
+	// 3Dモデルのスケールを拡大
+	MV1SetScale(modelHandle, VGet(3.0f, 3.0f, 3.0f));
 	// ３Ｄモデルの描画
 	MV1DrawModel(modelHandle);
 

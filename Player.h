@@ -46,6 +46,9 @@ private:
 	VECTOR	dir;			// 回転方向.
 	float	hitRadius;		// あたり判定の半径.
 
+	// player用サウンド変数
+	static int m_sHandle;
+
 	// 静的定数.
 	static const float ACCEL;
 	static const float MAX_SPEED;

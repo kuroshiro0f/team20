@@ -176,7 +176,9 @@
     <ClCompile Include="Target.cpp" />
     <ClCompile Include="TestSceneKoga.cpp" />
     <ClCompile Include="TestSceneUeyama.cpp" />
+    <ClCompile Include="TestScene_fujihara.cpp" />
     <ClCompile Include="Title.cpp" />
+    <ClCompile Include="UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -194,7 +196,9 @@
     <ClInclude Include="Target.h" />
     <ClInclude Include="TestSceneKoga.h" />
     <ClInclude Include="TestSceneUeyama.h" />
+    <ClInclude Include="TestScene_fujihara.h" />
     <ClInclude Include="Title.h" />
+    <ClInclude Include="UI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

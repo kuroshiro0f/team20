@@ -45,16 +45,12 @@ void Camera::Update(const Player& player)
 	// answer = a + ((b-a) * t)
 	// 
 	VECTOR aimPos = VAdd(/*player.GetPos()*/VGet(0,0,0), VScale(/*player.GetDir()*/VGet(0,0,-1), 50.0f));
-
 	// カメラの見る位置を少し上にする
 	aimPos = VAdd(aimPos, VGet(0, 0, 0));
-
 	VECTOR posToAim = VSub(aimPos, pos);
 	VECTOR scaledPosToAim = VScale(posToAim, 0.1f);
 	pos = VAdd(pos, scaledPosToAim);
 #endif
 	// カメラに位置を反映.
-	//SetCameraPositionAndTarget_UpVecY(pos, /*player.GetPos()*/VGet(0,0,50));
-	SetCameraPositionAndTarget_UpVecY(VGet(-80,60,-80), /*player.GetPos()*/VGet(20, 0, -20));
-
+	SetCameraPositionAndTarget_UpVecY(VGet(-80,60,-80), /*player.GetPos()*/VGet(20,0,-20));
 }
