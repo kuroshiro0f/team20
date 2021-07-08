@@ -27,7 +27,7 @@ Player::Player()
 	modelHandle = MV1LoadModel("data/model/sara/sara.pmx");
 
 	// posはVector型なので、VGetで原点にセット
-	pos = VGet(0, 0, 0);
+	pos = VGet(0, 10, -100);
 	// 移動する力を（すべての座標）ゼロにする
 	velocity = VGet(0, 0, 0);
 	// 
@@ -73,7 +73,7 @@ void Player::Update()
 		// キーが押されていない状態にする
 		KeyPush = false;
 		// posを原点にセット
-		pos = VGet(0, 0, 0);
+		pos = VGet(0, 10, -100);
 		// 移動する力を（すべての方向）ゼロにする
 		velocity = VGet(0, 0, 0);
 	}

@@ -5,11 +5,12 @@
 
 #pragma once
 
-class ObstructManager;
+class Target;
 class Player;
+class TestSceneKoga;
 
 class HitChecker
 {
 public:
-	static void Check(Player& player, ObstructManager& obstructManager);
+	static bool Check(Player& player, Target& Target);
 };

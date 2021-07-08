@@ -1,8 +1,13 @@
 #include "Target.h"
 #include "ObstructBase.h"
+#include "TestSceneKoga.h"
 
 // 静的定数.
-
+//const int Target::m_target_X = 400;
+const int Target::m_target_X = 0;
+const int Target::m_target_Y = 10;
+const int Target::m_target_Z = 0;
+const float Target::m_target_accel = 0.1f;
 
 //-----------------------------------------------------------------------------
 // @brief  コンストラクタ.
@@ -10,18 +15,18 @@
 Target::Target()
 	: modelHandle(-1)
 	, hitRadius(5.0f)
-	, score(false)
 	, timenow(0)
+	, m_isShot(false)
 {
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/target/icecream/SVH-icecream/icecream.pmx");
 
 	// posはVector型なので、VGetで原点にセット
-	pos = VGet(0, 0, 0);
+	pos = VGet(m_target_X, m_target_Y, m_target_Z);
 	// 移動する力を（すべての座標）ゼロにする
 	velocity = VGet(0, 0, 0);
 	// 
-	dir = VGet(0, 0, 1);
+	dir = VGet(-1, 0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -38,6 +43,21 @@ Target::~Target()
 //-----------------------------------------------------------------------------
 void Target::Update()
 {
+	VECTOR accelVec = VGet(0, 0, 0);
+	
+	//	アイス射出フラグがtrueになったら
+	if (m_isShot)
+	{
+		//accelVec = VScale(dir, m_target_accel);
+		if (pos.x < -500 || pos.x > 500)
+		{
+			accelVec = VGet(0, 0, 0);
+		}
+	}
+	
+
+	// ベロシティ加速計算.
+	velocity = VAdd(velocity, accelVec);
 
 
 	// 上下方向にいかないようにベロシティを整える.
@@ -77,7 +97,7 @@ void Target::Draw()
 	MV1DrawModel(modelHandle);
 
 	// デバッグあたり判定.
-	DrawSphere3D(pos, hitRadius, 5, 0x00ffff, 0x00ffff, false);
+	//DrawSphere3D(pos, hitRadius, 5, 0x00ffff, 0x00ffff, false);
 }
 
 //-----------------------------------------------------------------------------

@@ -6,12 +6,13 @@
 #include "HitChecker.h"
 #include "Player.h"
 #include "ObstructManager.h"
-#include "ObstructBase.h"
+#include "Target.h"
+#include "TestSceneKoga.h"
 
 //-----------------------------------------------------------------------------
 // @brief  ヒットチェック処理.
 //-----------------------------------------------------------------------------
-void HitChecker::Check(Player& player, ObstructManager& obstructManager)
+bool HitChecker::Check(Player& player, Target& _Target)
 {
 	// Z軸とX軸の二次元座標としてあたり判定を行う.
 	VECTOR yZeroPlayer = VGet(player.GetPos().x, 0, player.GetPos().z);
@@ -21,33 +22,19 @@ void HitChecker::Check(Player& player, ObstructManager& obstructManager)
 	while (isHit)
 	{
 		isHit = false;
-		for (int i = 0; i < LINE_OBSTRUCT_COL; i++)
-		{
-			for (int j = 0; j < LINE_OBSTRUCT_RAW; j++)
-			{
-				ObstructBase* obstruct = obstructManager.GetObstruct(j, i);
-				if (obstruct != NULL)
-				{
-					VECTOR yZeroObstruct = VGet(obstruct->GetPos().x, 0, obstruct->GetPos().z);
 
-					// お互いのポジションと半径の距離が重なったら当たっていることになる.
-					VECTOR playerToObs = VSub(yZeroObstruct, yZeroPlayer);
-					//printfDx("playerToObs:%f %f %f\n", playerToObs.x, playerToObs.y, playerToObs.z);
-					if (VSize(playerToObs) < player.GetHitRadius() + obstruct->GetHitRadius())
-					{
-						//printfDx("Hit!");
-						player.OnHitObstruct(*obstruct);
-						isHit = true;
-						break;
-					}
-				}
-			}
-			// ヒットしてたら計算やりなおし+二次元座標としてのプレイヤーの位置を更新.
-			if (isHit)
-			{
-				yZeroPlayer = VGet(player.GetPos().x, 0, player.GetPos().z);
-				break;
-			}
+		VECTOR yZeroObstruct = VGet(_Target.GetPos().x, 0, _Target.GetPos().z);
+		// お互いのポジションと半径の距離が重なったら当たっていることになる.
+	
+		VECTOR playerToObs = VSub(yZeroObstruct, yZeroPlayer);
+		//printfDx("playerToObs:%f %f %f\n", playerToObs.x, playerToObs.y, playerToObs.z);
+		if (VSize(playerToObs) < player.GetHitRadius() + _Target.GetHitRadius())
+		{
+			printfDx("Hit!");
+			isHit = true;
+			return true;
 		}
+		return false;
+		
 	}
 }

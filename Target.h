@@ -28,6 +28,8 @@ public:
 	// あたり判定半径の取得.
 	float GetHitRadius() { return hitRadius; }
 
+	void SetIsShot(bool _shotFlag) { m_isShot = _shotFlag; }
+
 private:
 	int		modelHandle;	// モデルハンドル.
 	VECTOR	pos;			// ポジション.
@@ -37,7 +39,19 @@ private:
 	VECTOR	dir;			// 回転方向.
 	float	hitRadius;		// あたり判定の半径.
 	int		timenow;		// 経過時間.
-	bool	score;			// 当たったかどうかの判定.
+	bool	m_isShot;
+
+	//	静的定数
+	static const float m_target_accel;
+	//static const float MAX_SPEED;
+	//static const float DEFAULT_DECEL;
+	//static const float BREAK_DECEL;
+	//static const float GRIP_DECEL;
+	//static const float GRIP_POWER;
+	//static const float COLIDE_DECEL_FAC;*/
+	static const int m_target_X;
+	static const int m_target_Y;
+	static const int m_target_Z;
 };
 
 #endif // _TARGET_H_
