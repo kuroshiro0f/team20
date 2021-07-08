@@ -14,6 +14,7 @@ Title::Title()
 	m_backGraphHandle = LoadGraph("data/img/Title_back.png");			//	グラフィックハンドルにタイトル画面のイメージをセット
 	m_logoGraphHandle = LoadGraph("data/img/Title_logo.png");			//	グラフィックハンドルにタイトル画面のイメージをセット
 	m_guidanceGraphHandle = LoadGraph("data/img/Title_guidance.png");	//	グラフィックハンドルにタイトル画面のイメージをセット
+	m_soundHandle = LoadSoundMem("data/sound/titleBgm.ogg");			//	サウンドハンドルにタイトル画面のBGMをセット
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
 		m_checkKeyFlag = TRUE;
@@ -22,6 +23,11 @@ Title::Title()
 
 Title::~Title()
 {
+	StopSoundMem(m_soundHandle);
+	DeleteSoundMem(m_soundHandle);
+	DeleteGraph(m_backGraphHandle);
+	DeleteGraph(m_logoGraphHandle);
+	DeleteGraph(m_guidanceGraphHandle);
 }
 
 SceneBase* Title::Update()
@@ -46,6 +52,12 @@ void Title::Draw()
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);							//	タイトル画面の背景を表示
 	DrawGraph(LOGO_X, LOGO_Y, m_logoGraphHandle, TRUE);					//	タイトル画面のロゴを表示
 	DrawGraph(GUIDANCE_X, GUIDANCE_Y, m_guidanceGraphHandle, TRUE);		//	タイトル画面のガイドを表示
+}
+
+void Title::Sound()
+{
+	PlaySoundMem(m_soundHandle, DX_PLAYTYPE_BACK,FALSE);
+	ChangeVolumeSoundMem(m_volumePal, m_soundHandle);
 }
 
 void Title::Load()
