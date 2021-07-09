@@ -30,6 +30,8 @@ public:
 
 	void SetIsShot(bool _shotFlag) { m_isShot = _shotFlag; }
 
+	bool GetEndShot() { return m_endShot; }
+
 private:
 	int		modelHandle;	// モデルハンドル.
 	VECTOR	pos;			// ポジション.
@@ -40,6 +42,7 @@ private:
 	float	hitRadius;		// あたり判定の半径.
 	int		timenow;		// 経過時間.
 	bool	m_isShot;
+	bool	m_endShot;
 
 	//	静的定数
 	static const float m_target_accel;

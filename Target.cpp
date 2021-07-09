@@ -17,6 +17,7 @@ Target::Target()
 	, hitRadius(5.0f)
 	, timenow(0)
 	, m_isShot(false)
+	, m_endShot(false)
 {
 	// ÇRÇcÉÇÉfÉãÇÃì«Ç›çûÇ›
 	modelHandle = MV1LoadModel("data/model/target/icecream/SVH-icecream/icecream.pmx");
@@ -49,9 +50,10 @@ void Target::Update()
 	if (m_isShot)
 	{
 		accelVec = VScale(dir, m_target_accel);
-		if (pos.x < -500 || pos.x > 500)
+		if (pos.x < -500 || pos.x > 500 && !m_endShot)
 		{
 			accelVec = VGet(0, 0, 0);
+			m_endShot = true;
 		}
 	}
 	
