@@ -9,8 +9,8 @@
 #include "Camera.h"
 
 #include "DxLib.h"
-
-
+#include "Effect.h"
+#include "TestScene_fujihara.h"
 
 static int enemyNum = 10;
 
@@ -18,27 +18,29 @@ TestSceneKoga::TestSceneKoga()
 	:m_player(nullptr)
 	, m_camera(nullptr)
 	, m_mark(nullptr)
+	, m_effect(nullptr)
 	, m_targetCount(0)
 	, m_startTime(0)
 	, m_iceThrowFlag(false)
+	, m_hitFrag(false)
+	, m_iceHitFlagBuffer(false)
+	//　確認用
+	, m_hitCount(0)
+	
 {
 	// 次のシーンへ移行するかどうか
 	m_finishFlag = FALSE;
 	// エネミー・スコアUI初期化
 	for (int i = 0; i < enemyNum; i++)
 	{
-		//m_target[i] = nullptr;
+		m_target[i] = nullptr;
 		m_score_ui[i] = nullptr;
 		m_hit_ui[i] = nullptr;
 	}
-	for (int i = 0; i < enemyNum + 1; i++)
-	{
-		m_target[i] = nullptr;
-		//m_score_ui[i] = nullptr;
-		//m_hit_ui[i] = nullptr;
-	}
+	m_target[enemyNum] = nullptr;
+
+	// 開始時のタイムを取得
 	m_startTime = GetNowCount() / 1000;
-	
 }
 
 TestSceneKoga::~TestSceneKoga()
@@ -59,6 +61,8 @@ TestSceneKoga::~TestSceneKoga()
 	}
 	delete m_target[enemyNum];
 
+	m_effect->Delete();
+	delete m_effect;
 }
 
 SceneBase* TestSceneKoga::Update()
@@ -77,6 +81,7 @@ SceneBase* TestSceneKoga::Update()
 		m_target[m_targetCount]->SetSetTime(m_startTime);
 	}
 
+
 	// エネミー射出管理
 	if (GetNowCount() / 1000 - m_startTime > 3)
 	{
@@ -87,7 +92,7 @@ SceneBase* TestSceneKoga::Update()
 		}
 		if (m_target[m_targetCount]->GetIceState() == END_SHOT)
 		{
-			m_target[m_targetCount + 1] ->SetSetTime(m_startTime);
+			m_target[m_targetCount + 1]->SetSetTime(m_startTime);
 			m_targetCount++;
 		}
 	}
@@ -95,21 +100,36 @@ SceneBase* TestSceneKoga::Update()
 	// 現在の番号に応じてエネミーの更新
 	//for (int i = 0; i < m_targetCount; i++)
 	//{
-		m_target[m_targetCount]->Update();
-		m_target[m_targetCount]->SetTargetCount(m_targetCount);
-		m_target[m_targetCount]->Reaction(HitChecker::Check(*m_player, *m_target[m_targetCount]));
-
+	m_target[m_targetCount]->Update();
+	m_target[m_targetCount]->SetTargetCount(m_targetCount);
+	m_iceHitFlagBuffer = HitChecker::Check(*m_player, *m_target[m_targetCount]);
+	m_target[m_targetCount]->Reaction(m_hit_ui[m_targetCount] , m_iceHitFlagBuffer);
+	//m_hit_ui[m_targetCount]->ScoreUpdate(m_iceHitFlagBuffer);
 	//}
 	m_player->Update();
 
 	m_camera->Update(*m_player);
 
+	// 当たり判定によるスコアの更新処理
+	//if (HitChecker::Check(*m_player, *m_target[m_targetCount - 1]))
+	//{
+	//	m_hit_ui[m_targetCount - 1]->ScoreUpdate(m_hit_ui[m_targetCount - 1], true);
+	//}
+	//if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
+	//{
+	//	m_hit_ui[m_targetCount - 1]->ScoreUpdate(m_hit_ui[m_targetCount - 1], false);
+	//}
+
+
+
 	if (m_targetCount == enemyNum)	//	エンターが押されたら
 	{
-		m_finishFlag = true;
+		m_finishFlag = TRUE;
 	}
-	if (m_finishFlag == true)
+	if (m_finishFlag == TRUE)
 	{
+		// scoreUIのスコアをResultのscore変数にセット
+
 		WaitTimer(3000);
 		return new Result(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
 	}
@@ -125,17 +145,24 @@ void TestSceneKoga::Draw()
 		m_target[i]->Draw();
 	}
 	m_player->Draw();
-	if (m_finishFlag == TRUE)
+	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
-		DrawGraph(0, 0, m_finishGraphHandle, TRUE);							//	タイトル画面の背景を表示
+		DrawGraph(0, 0, m_finishGraphHandle, TRUE);							//	最後のエネミーが射出され終わったら"ゲーム終了"の表示
 	}
 	for (int i = 0; i < enemyNum; ++i)
 	{
 		m_score_ui[i]->Draw();
 	}
-	for (int i = 0; i < hitCount; ++i)
+	for (int i = 0; i <= m_targetCount; ++i)
 	{
 		m_hit_ui[i]->Draw();
+	}
+
+	// エフェクトの再生
+	if (!(m_effect->GetNowPlaying() == 0) && m_target[m_targetCount]->GetHitIce())
+	{
+		m_effect->PlayEffekseer(VGet(0, 20, 0));
+		m_target[m_targetCount]->SetHitIce(false);
 	}
 	/*m_obstructManager->Draw();*/
 	/*DrawString(0, 0, "ゲーム画面です", GetColor(255, 255, 255));*/
@@ -143,7 +170,7 @@ void TestSceneKoga::Draw()
 
 void TestSceneKoga::Sound()
 {
-	if (m_finishFlag == TRUE)
+	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
 		StopSoundMem(m_soundHandle);
 		PlaySoundMem(m_finishSoundHandle, DX_PLAYTYPE_BACK, FALSE);
@@ -166,10 +193,12 @@ void TestSceneKoga::Load()
 	m_player = new Player;			//	プレイヤークラスのインスタンスを生成
 	m_camera = new Camera;			//	カメラクラスのインスタンスを生成
 	m_mark = new Mark;				//	マーククラスのインスタンスを生成
-	for (int i = 0; i < enemyNum + 1; i++)
+	for (int i = 0; i < enemyNum; i++)
 	{
 		m_target[i] = new Target;
 	}
+	m_target[enemyNum] = new Target();
+
 	for (int i = 0; i < 2; ++i)
 	{
 		for (int j = 0; j < 5; ++j)
@@ -181,6 +210,8 @@ void TestSceneKoga::Load()
 	// UIクラスのprivateメンバ変数に画像ハンドルをロード
 	m_score_ui[0]->Load();
 
+	m_effect = new PlayEffect("data/effects/FeatherBomb.efk");
+
 }
 
 void TestSceneKoga::DebugKey()
@@ -188,20 +219,20 @@ void TestSceneKoga::DebugKey()
 	// 確認用
 	if (CheckHitKey(KEY_INPUT_A))
 	{
-		if (hitCount < enemyNum)
+		if (m_hitCount < enemyNum)
 		{
-			hitFrag = true;
-			m_hit_ui[hitCount]->ScoreUpdate(m_hit_ui[hitCount], hitFrag);
-			hitCount++;
+			m_hitFrag = true;
+			//m_hit_ui[m_hitCount]->ScoreUpdate(m_hit_ui[m_hitCount], m_hitFlag);
+			m_hitCount++;
 		}
 	}
 	if (CheckHitKey(KEY_INPUT_B))
 	{
-		if (hitCount < enemyNum)
+		if (m_hitCount < enemyNum)
 		{
-			hitFrag = false;
-			m_hit_ui[hitCount]->ScoreUpdate(m_hit_ui[hitCount], hitFrag);
-			hitCount++;
+			m_hitFrag = false;
+			//m_hit_ui[m_hitCount]->ScoreUpdate(m_hit_ui[m_hitCount], m_hitFlag);
+			m_hitCount++;
 		}
 	}
 	if (m_iceThrowFlag)

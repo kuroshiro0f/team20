@@ -5,6 +5,8 @@
 
 class ObstructBase;
 class TestSceneKoga;
+class PlayEffect;
+class UI;
 
 enum Target_State
 {
@@ -19,7 +21,7 @@ public:
 
 	void Update();			// 更新.
 	void Draw();			// 描画.
-	void Reaction(bool _hitFlag);		// リアクション.
+	void Reaction(UI* _ui, bool _hitFlag);		// リアクション.
 
 
 
@@ -40,8 +42,10 @@ public:
 	void SetTargetCount(int _targetCount) { m_targetCount = _targetCount; }
 	void SetSetTime(int _setTime) { m_setTime = _setTime; }
 
+	void SetHitIce(bool _hitFlag) { m_hitFlag = _hitFlag; }
+	bool GetHitIce() { return m_hitFlag; }
 
-
+	static void ScoreUpdateUI(UI& _ui, bool _hitFlag);
 
 	Target_State GetIceState() { return m_iceState; }
 	void SetIceState(Target_State _iceState) { m_iceState = _iceState; }
@@ -57,7 +61,7 @@ private:
 	VECTOR	dir;			// 回転方向.
 	float	hitRadius;		// あたり判定の半径.
 	int		timenow;		// 経過時間.
-
+	bool	m_hitFlag;
 
 
 	int		m_targetCount;

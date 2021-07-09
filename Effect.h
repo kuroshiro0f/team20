@@ -41,5 +41,4 @@ private:
 
 	int m_effectHandle;        // 被ダメージエフェクトのハンドル
 	int m_playingEffect;
-
 };

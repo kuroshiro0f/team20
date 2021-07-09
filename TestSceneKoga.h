@@ -15,6 +15,7 @@ public:
 	void DebugKey();
 
 	int GetTargetCount() { return m_targetCount; }
+	 
 
 private:
 	class Player* m_player;			//	プレイヤークラスへのポインタメンバ変数
@@ -23,6 +24,7 @@ private:
 	class Mark* m_mark;				//	マーククラスへのポインタメンバ変数
 	class UI* m_score_ui[10];		//  UIクラスへのポインタメンバ変数
 	class UI* m_hit_ui[10];			//	ヒット判定UIクラスへのポインタメンバ変数
+	class PlayEffect* m_effect;     //  エフェクトプレーヤー
 	int m_targetCount;				//	アイスの飛ばした個数
 	int m_startTime;				//	ゲームの開始時間
 	int m_backGraphHandle;			//	背景のグラフィックハンドル
@@ -32,8 +34,9 @@ private:
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_finishFlag;				//	ゲーム終了判定フラグ
 	bool m_iceThrowFlag;			//	アイス射出フラグ
+	bool m_iceHitFlagBuffer;
 
 	//// 確認用変数
-	int hitCount = 0;
-	bool hitFrag = false;
+	int m_hitCount = 0;
+	bool m_hitFrag = false;
 };
