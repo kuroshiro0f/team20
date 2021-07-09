@@ -4,6 +4,12 @@
 #include "DxLib.h"
 
 class ObstructBase;
+class TestSceneKoga;
+
+enum Target_State
+{
+	NO_SHOT, NOW_SHOT, END_SHOT
+};
 
 class Target
 {
@@ -13,6 +19,9 @@ public:
 
 	void Update();			// 更新.
 	void Draw();			// 描画.
+	void Reaction(bool _hitFlag);		// リアクション.
+
+
 
 	// モデルハンドルの取得.
 	int GetModelHandle() { return modelHandle; }
@@ -28,18 +37,32 @@ public:
 	// あたり判定半径の取得.
 	float GetHitRadius() { return hitRadius; }
 
-	void SetIsShot(bool _shotFlag) { m_isShot = _shotFlag; }
+	void SetTargetCount(int _targetCount) { m_targetCount = _targetCount; }
+	void SetSetTime(int _setTime) { m_setTime = _setTime; }
+
+
+
+
+	Target_State GetIceState() { return m_iceState; }
+	void SetIceState(Target_State _iceState) { m_iceState = _iceState; }
 
 private:
 	int		modelHandle;	// モデルハンドル.
+	int		m_FontHandle;	// フォントハンドル
 	VECTOR	pos;			// ポジション.
 
 	VECTOR	velocity;		// 移動力.
+	VECTOR	accelVec;
 
 	VECTOR	dir;			// 回転方向.
 	float	hitRadius;		// あたり判定の半径.
 	int		timenow;		// 経過時間.
-	bool	m_isShot;
+
+
+
+	int		m_targetCount;
+	int		m_plusX;
+	int		m_setTime;
 
 	//	静的定数
 	static const float m_target_accel;
@@ -52,6 +75,12 @@ private:
 	static const int m_target_X;
 	static const int m_target_Y;
 	static const int m_target_Z;
+	static const int m_font_X;
+	static const int m_font_Y;
+	static const int m_font_size;
+	static const int m_font_thick;
+	
+	Target_State m_iceState;
 };
 
 #endif // _TARGET_H_
