@@ -21,6 +21,21 @@ PlayEffect::PlayEffect(const char* sourceEffectHandle)
 
 }
 
+// コンストラクタ2 (スケール指定)
+PlayEffect::PlayEffect(const char* sourceEffectHandle, float _scale)
+	:m_effectHandle(-1)
+	, m_playPos(VGet(0, 0, 0))
+	, m_playingEffect(-1)
+{
+	// モデルのロード
+	m_effectHandle = LoadEffekseerEffect(sourceEffectHandle, _scale);
+	if (m_effectHandle == -1)
+	{
+		printfDx("エフェクト読み込み失敗");
+	}
+
+}
+
 // デストラクタ
 PlayEffect::~PlayEffect()
 {
@@ -55,6 +70,24 @@ const int PlayEffect::GetNowPlaying()
 	return IsEffekseer3DEffectPlaying(m_playingEffect);
 }
 
+/// <summary>
+/// 再生中のエフェクトの座標を変える
+/// </summary>
+/// <param name="_size"></param>
+void PlayEffect::SetPlayingEffectPos(const VECTOR& _playPos)
+{
+	SetPosPlayingEffekseer3DEffect(m_effectHandle, _playPos.x, _playPos.y, _playPos.z);
+}
+
+/// <summary>
+/// 再生中エフェクトの回転
+/// </summary>
+/// <param name="_dirVec"></param>
+void PlayEffect::SetPlayingEffectRotation(const VECTOR& _dirVec)
+{
+	SetRotationPlayingEffekseer3DEffect(m_effectHandle, _dirVec.x, _dirVec.y, _dirVec.z);
+}
+
 // Effekseer3Dの描画
 void PlayEffect::PlayEffekseer(const VECTOR in_playPos)
 {
@@ -70,7 +103,6 @@ void PlayEffect::PlayEffekseer(const VECTOR in_playPos)
 
 	// エフェクトを再生する座標を指定
 	SetPosPlayingEffekseer3DEffect(m_playingEffect, m_playPos.x, m_playPos.y, m_playPos.z);
-
 }
 
 // Effekseer3Dのサイズを指定した再生

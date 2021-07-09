@@ -15,6 +15,7 @@ class PlayEffect
 public:
 
 	PlayEffect(const char* sourceEffectHandle);
+	PlayEffect(const char* sourceEffectHandle, float _scale);
 	~PlayEffect();
 
 	void Delete();
@@ -32,8 +33,14 @@ public:
 
 	const int GetNowPlaying();    // エフェクトが再生中かどうか(0:再生中  1:再生されていない)
 
-	// 再生するエフェクトの拡大率を変更する
-	void SetEffectScale(const float in_sizeX, const float in_sizeY, const float in_sizeZ) { SetScalePlayingEffekseer3DEffect(m_playingEffect, in_sizeX, in_sizeY, in_sizeZ); }
+	// 再生中のエフェクトの座標セッター
+	void SetPlayingEffectPos(const VECTOR& _playPos);
+
+	// 再生中エフェクトの回転値セッター
+	void SetPlayingEffectRotation(const VECTOR& _dirVec);
+
+	// 再生中のエフェクトの拡大率を変更する
+	void SetPlayingEffectScale(const float in_sizeX, const float in_sizeY, const float in_sizeZ) { SetScalePlayingEffekseer3DEffect(m_playingEffect, in_sizeX, in_sizeY, in_sizeZ); }
 
 private:
 

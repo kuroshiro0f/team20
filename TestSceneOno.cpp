@@ -19,6 +19,7 @@ TestSceneOno::TestSceneOno()
 	, m_camera(nullptr)
 	, m_mark(nullptr)
 	,m_effect(nullptr)
+	,m_playerOrbitEfk(nullptr)
 	, m_targetCount(0)
 	, m_startTime(0)
 	, m_iceThrowFlag(false)
@@ -30,12 +31,13 @@ TestSceneOno::TestSceneOno()
 	// エネミー・スコアUI初期化
 	for (int i = 0; i < enemyNum; i++)
 	{
-		m_target[i] = nullptr;
 		m_score_ui[i] = nullptr;
 		m_hit_ui[i] = nullptr;
 	}
-	m_target[enemyNum] = nullptr;
-	
+
+	// ターゲット領域の確保
+	m_targets.resize(enemyNum + 1);
+
 	m_startTime = GetNowCount() / 1000;
 }
 
@@ -51,15 +53,21 @@ TestSceneOno::~TestSceneOno()
 	DeleteSoundMem(m_finishSoundHandle);
 	for (int i = 0; i < enemyNum; i++)
 	{
-		delete m_target[i];
 		delete m_score_ui[i];		//  スコアUIへのポインタメンバ変数
 		delete m_hit_ui[i];			//	ヒット判定UIへのポインタメンバ変数
 	}
-	delete m_target[enemyNum];
+
+	// 全ターゲットの確保
+	while (!m_targets.empty())
+	{
+		delete m_targets.back();
+		m_targets.pop_back();
+	}
 
 	m_effect->Delete();
 	delete m_effect;
-
+	m_playerOrbitEfk->Delete();
+	delete m_playerOrbitEfk;
 }
 
 SceneBase* TestSceneOno::Update()
@@ -77,21 +85,21 @@ SceneBase* TestSceneOno::Update()
 	if (GetNowCount() / 1000 - m_startTime > 1)
 	{
 		m_startTime = GetNowCount() / 1000;
-		m_target[m_targetCount]->SetIceState(Target_State::NOW_SHOT);
+		m_targets[m_targetCount]->SetIceState(Target_State::NOW_SHOT);
 		m_targetCount++;
 	}
 
 	// 現在の番号に応じてエネミーの更新
 	for (int i = 0; i < m_targetCount; i++)
 	{
-		m_target[i]->Update();
+		m_targets[i]->Update();
 	}
 	m_player->Update();
 
 	m_camera->Update(*m_player);
 	for (int i = 0; i < m_targetCount; i++)
 	{
-		HitChecker::Check(*m_player, *m_target[i]);
+		HitChecker::Check(*m_player, *m_targets[i]);
 	}
 	if (m_targetCount > enemyNum)	//	エンターが押されたら
 	{
@@ -111,7 +119,7 @@ void TestSceneOno::Draw()
 	m_mark->Mark_Draw();
 	for (int i = 0; i < m_targetCount; i++)
 	{
-		m_target[i]->Draw();
+		m_targets[i]->Draw();
 	}
 	m_player->Draw();
 	if (m_finishFlag == TRUE)
@@ -133,6 +141,19 @@ void TestSceneOno::Draw()
 		m_effect->PlayEffekseer(VGet(0, 20, 0));
 	}
 
+	// プレイヤーの軌道エフェクト
+	if (m_playerOrbitEfk->GetNowPlaying() != 0)
+	{
+		m_playerOrbitEfk->PlayEffekseer(m_player->GetPos());
+		VECTOR efkDir = VGet(0.0f, DX_PI_F, 0.0f);
+		m_playerOrbitEfk->SetPlayingEffectRotation(efkDir);
+	}
+	else
+	{
+		// エフェクト再生中はプレイヤーの座標を追尾
+		m_playerOrbitEfk->SetPlayingEffectPos(m_player->GetPos());
+	}
+	
 }
 
 void TestSceneOno::Sound()
@@ -160,11 +181,13 @@ void TestSceneOno::Load()
 	m_player = new Player;			//	プレイヤークラスのインスタンスを生成
 	m_camera = new Camera;			//	カメラクラスのインスタンスを生成
 	m_mark = new Mark;				//	マーククラスのインスタンスを生成
-	for (int i = 0; i < enemyNum; i++)
+
+	// ターゲットの生成
+	for (int i = 0; i < m_targets.size(); i++)
 	{
-		m_target[i] = new Target;
+		m_targets[i] = new Target();
 	}
-	m_target[enemyNum] = new Target;
+
 	for (int i = 0; i < 2; ++i)
 	{
 		for (int j = 0; j < 5; ++j)
@@ -177,6 +200,7 @@ void TestSceneOno::Load()
 	m_score_ui[0]->Load();
 
 	m_effect = new PlayEffect("data/effects/FeatherBomb.efk");
+	m_playerOrbitEfk = new PlayEffect("data/effects/PlayerLine.efk");
 
 }
 
