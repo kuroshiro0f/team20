@@ -34,6 +34,7 @@ private:
 	int permeationAmount;
 	// 透過量
 	int transParent;
+	int m_click_sound_handle;			//	ENTERで進むときのサウンドハンドル
 	int m_bgmSoundHandle;				//	BGMのサウンドハンドル
 	int m_scoreSoundHandle;				//	スコアのサウンドハンドル
 	int m_numSoundHandle;				//	数表示のサウンドハンドル

@@ -8,6 +8,7 @@
 #include "Title.h"
 #include "TestSceneUeyama.h"
 #include "TestSceneKoga.h"
+#include "TestScene_fujihara.h"
 #include "TestSceneOno.h"
 #include "EffekseerForDXLib.h"
 void InitializeEffekseer();
@@ -33,6 +34,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//	タイトルシーンをセット
 	Scene->SetScene(new Title);
+	//Scene->SetScene(new TestScene_fujihara);
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
@@ -62,6 +64,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// シーンを削除
 	delete(Scene);
+
+	Effkseer_End();
 
 	// ＤＸライブラリの後始末
 	DxLib_End();

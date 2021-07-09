@@ -10,13 +10,15 @@ const int NICE_P = 5;
 const int PF_P = 10;
 
 // 最大透過量
-const int defaultTrans = 122;
+const int defaultTrans = 255;
 // 透過量変化用ベクトル
 const int transModeration = -1;
 
 Result::Result(const int &_score)
 	:m_score(_score)
 {
+	m_click_sound_handle = LoadSoundMem("data/sound/EnterToSound.wav");	//	ENTERで進む際のサウンドをロード
+
 	if (m_score < NICE_P)
 	{
 		m_evaluation = 0;
@@ -54,7 +56,7 @@ Result::Result(const int &_score)
 	m_scoreSoundHandle = LoadSoundMem("data/sound/score.mp3");				//	サウンドハンドルにリザルト画面の効果音をセット
 	m_numSoundHandle = LoadSoundMem("data/sound/num.mp3");					//	サウンドハンドルにリザルト画面の効果音をセット
 
-	// 透過量変数を122に設定
+	// 透過量変数を255に設定
 	transParent = defaultTrans;
 	// 毎透過量変数を１に設定
 	permeationAmount = 1;
@@ -80,6 +82,8 @@ Result::~Result()
 	DeleteSoundMem(m_scoreSoundHandle);
 	DeleteSoundMem(m_numSoundHandle);
 	DeleteSoundMem(m_evaluationSoundHandle[m_evaluation]);
+	DeleteSoundMem(m_click_sound_handle);					//	ENTERで進むときのサウンドメモリを解放
+
 }
 
 SceneBase* Result::Update()
@@ -103,11 +107,11 @@ SceneBase* Result::Update()
 		m_checkKeyFlag = FALSE;
 	}
 
-	// 透過量が122より大きくなったら
+	// 透過量が255より大きくなったら
 	if (transParent >= defaultTrans)
 	{
 		// 透過量を121に設定
-		transParent = 121;
+		transParent = defaultTrans-1;
 		// 毎透過量を-1にする
 		permeationAmount *= transModeration;
 	}
@@ -124,6 +128,7 @@ SceneBase* Result::Update()
 
 	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
 	{
+		PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);		//	音が再生し終わるまで待機
 		return new Title;
 	}
 	return this;
