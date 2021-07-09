@@ -212,7 +212,7 @@ void TestSceneOno::DebugKey()
 		if (m_hitCount < enemyNum)
 		{
 			m_hitFlag = true;
-			m_hit_ui[m_hitCount]->ScoreUpdate(m_hit_ui[m_hitCount], m_hitFlag);
+			//m_hit_ui[m_hitCount]->ScoreUpdate(m_hit_ui[m_hitCount], m_hitFlag);
 			m_hitCount++;
 		}
 	}
@@ -221,7 +221,7 @@ void TestSceneOno::DebugKey()
 		if (m_hitCount < enemyNum)
 		{
 			m_hitFlag = false;
-			m_hit_ui[m_hitCount]->ScoreUpdate(m_hit_ui[m_hitCount], m_hitFlag);
+			//m_hit_ui[m_hitCount]->ScoreUpdate(m_hit_ui[m_hitCount], m_hitFlag);
 			m_hitCount++;
 		}
 	}

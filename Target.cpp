@@ -27,6 +27,7 @@ Target::Target()
 	, m_targetCount(0)
 	, m_plusX(0)
 	, m_setTime(0) 
+	,m_shotInterval(5)
 	, m_iceState(NO_SHOT)
 	, m_hitFlag(false)
 {
@@ -116,7 +117,7 @@ void Target::Draw()
 	{
 		int timebuffer = GetNowCount() / 1000;
 		
-		DrawFormatStringToHandle(m_font_X, m_font_Y, GetColor(255, 255, 255),m_FontHandle, "%d", 4-(timebuffer - m_setTime));
+		DrawFormatStringToHandle(m_font_X, m_font_Y, GetColor(255, 255, 255),m_FontHandle, "%d", (m_shotInterval + 1) - (timebuffer - m_setTime));
 	}
 
 	// デバッグあたり判定.
@@ -132,7 +133,7 @@ void Target::Reaction(UI* _ui, bool _hitFlag)
 	{
 	case true:
 		m_plusX = 20 + m_targetCount * 10;
-		pos = VGet(m_plusX, 10, 20);
+		pos = VGet(m_plusX, 100, -200);
 		m_hitFlag = true;
 
 		ScoreUpdateUI(*_ui, _hitFlag);

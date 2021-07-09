@@ -30,7 +30,7 @@ bool HitChecker::Check(Player& player, Target& _Target)
 		//printfDx("playerToObs:%f %f %f\n", playerToObs.x, playerToObs.y, playerToObs.z);
 		if (VSize(playerToObs) < player.GetHitRadius() + _Target.GetHitRadius())
 		{
-			printfDx("Hit!");
+			//printfDx("Hit!");
 			isHit = true;
 			return true;
 		}

@@ -36,11 +36,15 @@ public:
 	const VECTOR& GetDir() const { return dir; }
 	void SetDir(const VECTOR set) { dir = set; }
 
+	// 加速(accelVec)のSetter
+	void SetAccelVec(const VECTOR& _accel) { accelVec = _accel; }
+
 	// あたり判定半径の取得.
 	float GetHitRadius() { return hitRadius; }
 
 	void SetTargetCount(int _targetCount) { m_targetCount = _targetCount; }
 	void SetSetTime(int _setTime) { m_setTime = _setTime; }
+	void SetInterval(int _interval) { m_shotInterval = _interval; }
 
 	void SetHitIce(bool _hitFlag) { m_hitFlag = _hitFlag; }
 	bool GetHitIce() { return m_hitFlag; }
@@ -67,6 +71,7 @@ private:
 	int		m_targetCount;
 	int		m_plusX;
 	int		m_setTime;
+	int     m_shotInterval;     // エネミーを飛ばす間隔
 
 	//	静的定数
 	static const float m_target_accel;

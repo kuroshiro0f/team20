@@ -93,11 +93,11 @@ SceneBase* TestScene_fujihara::Update()
 	// 当たり判定によるスコアの更新処理
 	if (HitChecker::Check(*m_player, *m_target[m_targetCount-1]))
 	{
-		m_hit_ui[m_targetCount-1]->ScoreUpdate(m_hit_ui[m_targetCount-1], true);
+		//m_hit_ui[m_targetCount-1]->ScoreUpdate(m_hit_ui[m_targetCount-1], true);
 	}
 	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
-		m_hit_ui[m_targetCount-1]->ScoreUpdate(m_hit_ui[m_targetCount-1], false);
+		//m_hit_ui[m_targetCount-1]->ScoreUpdate(m_hit_ui[m_targetCount-1], false);
 	}
 	
 	//HitChecker::Check(*m_player, *m_target[m_targetCount]);

@@ -13,14 +13,26 @@
 #include "TestScene_fujihara.h"
 
 static int enemyNum = 10;
+static int GIRL_Y = 0;
+static int LADY_Y = 0;
+static int GIRL_MIN_Y = -75;
+static int LADY_MIN_Y = -75;
+
+// ターゲットが飛んでくる間隔 (秒単位)
+static const int TARGET_SHOT_INTERVAL = 3;
 
 Game::Game()
 	:m_player(nullptr)
 	,m_camera(nullptr)
 	,m_mark(nullptr)
+	, m_effect(nullptr)
 	, m_targetCount(0)
 	, m_startTime(0)
 	, m_iceThrowFlag(false)
+	, m_iceHitFlagBuffer(false)
+	, m_girl_Y(GIRL_Y)
+	, m_lady_Y(LADY_Y)
+	, m_girlUpFlag(true)
 	//　確認用
 	,m_hitCount(0)
 	,m_hitFlag(false)
@@ -48,6 +60,9 @@ Game::~Game()
 	StopSoundMem(m_finishSoundHandle);
 	DeleteGraph(m_backGraphHandle);
 	DeleteGraph(m_finishGraphHandle);
+	DeleteGraph(m_manualGraphHandle);
+	DeleteGraph(m_girlGraphHandle);
+	DeleteGraph(m_ladyGraphHandle);
 	DeleteSoundMem(m_soundHandle);
 	DeleteSoundMem(m_finishSoundHandle);
 	for (int i = 0; i < enemyNum; i++)
@@ -57,6 +72,9 @@ Game::~Game()
 		delete m_hit_ui[i];			//	ヒット判定UIへのポインタメンバ変数
 	}
 	delete m_target[enemyNum];
+
+	m_effect->Delete();
+	delete m_effect;
 }
 
 SceneBase* Game::Update()
@@ -77,7 +95,7 @@ SceneBase* Game::Update()
 
 
 	// エネミー射出管理
-	if (GetNowCount() / 1000 - m_startTime > 5)
+	if (GetNowCount() / 1000 - m_startTime > TARGET_SHOT_INTERVAL)
 	{
 		m_startTime = GetNowCount() / 1000;
 		if (m_target[m_targetCount]->GetIceState() == NO_SHOT)
@@ -92,26 +110,35 @@ SceneBase* Game::Update()
 	}
 
 	// 現在の番号に応じてエネミーの更新
-	//for (int i = 0; i < m_targetCount; i++)
-	//{
 	m_target[m_targetCount]->Update();
 	m_target[m_targetCount]->SetTargetCount(m_targetCount);
-	//m_target[m_targetCount]->Reaction(HitChecker::Check(*m_player, *m_target[m_targetCount]));
+	m_iceHitFlagBuffer = HitChecker::Check(*m_player, *m_target[m_targetCount]);
+	m_target[m_targetCount]->Reaction(m_hit_ui[m_targetCount], m_iceHitFlagBuffer);
 
-	//}
 	m_player->Update();
 
 	m_camera->Update(*m_player);
 
-	// 当たり判定によるスコアの更新処理
-	//if (HitChecker::Check(*m_player, *m_target[m_targetCount - 1]))
-	//{
-	//	m_hit_ui[m_targetCount - 1]->ScoreUpdate(m_hit_ui[m_targetCount - 1], true);
-	//}
-	//if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
-	//{
-	//	m_hit_ui[m_targetCount - 1]->ScoreUpdate(m_hit_ui[m_targetCount - 1], false);
-	//}
+
+	// UIの中華娘を動かす
+	if (m_girlUpFlag)
+	{
+		m_girl_Y--;
+		if (m_girl_Y < GIRL_MIN_Y)
+		{
+			m_girl_Y = GIRL_MIN_Y;
+			m_girlUpFlag = false;
+		}
+	}
+	else if (!m_girlUpFlag)
+	{
+		m_girl_Y++;
+		if (m_girl_Y > 0)
+		{
+			m_girl_Y = 0;
+			m_girlUpFlag = true;
+		}
+	}
 
 
 
@@ -131,13 +158,24 @@ SceneBase* Game::Update()
 
 void Game::Draw()
 {
-	DrawGraph(0, 0, m_backGraphHandle, TRUE);							//	タイトル画面の背景を表示
+	// 背景
+	DrawGraph(0, 0, m_backGraphHandle, TRUE);
+	// 操作説明系
+	DrawGraph(0, 0, m_manualGraphHandle, TRUE);							//	操作説明を表示
+	DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
+	DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);//	タイトル画面の背景を表示
+	// 目印となる机
 	m_mark->Mark_Draw();
+	// ターゲット(アイス)
 	for (int i = 0; i <= m_targetCount; i++)
 	{
 		m_target[i]->Draw();
 	}
+
+	// プレーヤー
 	m_player->Draw();
+
+	// 終了時
 	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
 		DrawGraph(0, 0, m_finishGraphHandle, TRUE);							//	最後のエネミーが射出され終わったら"ゲーム終了"の表示
@@ -150,6 +188,14 @@ void Game::Draw()
 	{
 		m_hit_ui[i]->Draw();
 	}
+
+	// エフェクトの再生
+	if (!(m_effect->GetNowPlaying() == 0) && m_target[m_targetCount]->GetHitIce())
+	{
+		m_effect->PlayEffekseer(VGet(0, 20, 0));
+		m_target[m_targetCount]->SetHitIce(false);
+	}
+
 	/*m_obstructManager->Draw();*/
 	/*DrawString(0, 0, "ゲーム画面です", GetColor(255, 255, 255));*/
 }
@@ -175,15 +221,18 @@ void Game::Load()
 	m_backGraphHandle = LoadGraph("data/img/gameBack.png");			//	グラフィックハンドルにゲーム画面のイメージをセッ
 	m_soundHandle = LoadSoundMem("data/sound/gameBgm.ogg");			//	サウンドハンドルにゲーム画面のBGMをセット
 	m_finishSoundHandle = LoadSoundMem("data/sound/gameEnd.wav");		//	サウンドハンドルにゲーム終了時の効果音をセット
+	m_girlGraphHandle = LoadGraph("data/img/chinaGirl.png");
+	m_ladyGraphHandle = LoadGraph("data/img/chinaLady.png");
+	m_manualGraphHandle = LoadGraph("data/img/manual.png");			//	グラフィックハンドルに操作説明のイメージをセット
 	int scoreHandle = LoadGraph("data/model/score_ui/score(1).png");
 	m_player = new Player;			//	プレイヤークラスのインスタンスを生成
 	m_camera = new Camera;			//	カメラクラスのインスタンスを生成
 	m_mark = new Mark;				//	マーククラスのインスタンスを生成
-	for (int i = 0; i < enemyNum; i++)
+	for (int i = 0; i < (enemyNum + 1); i++)
 	{
 		m_target[i] = new Target;
+		m_target[i]->SetInterval(TARGET_SHOT_INTERVAL);
 	}
-	m_target[enemyNum] = new Target();
 
 	for (int i = 0; i < 2; ++i)
 	{
@@ -195,6 +244,8 @@ void Game::Load()
 	}
 	// UIクラスのprivateメンバ変数に画像ハンドルをロード
 	m_score_ui[0]->Load();
+
+	m_effect = new PlayEffect("data/effects/FeatherBomb.efk");
 
 }
 
