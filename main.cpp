@@ -8,6 +8,9 @@
 #include "Title.h"
 #include "TestSceneUeyama.h"
 #include "TestSceneKoga.h"
+#include "TestSceneOno.h"
+#include "EffekseerForDXLib.h"
+void InitializeEffekseer();
 
 //-----------------------------------------------------------------------------
 // @brief  メイン関数.
@@ -19,7 +22,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		return -1;	// エラーが起きたら直ちに終了
 	}
-
+	InitializeEffekseer();
 	// 画面モードのセット
 	SetGraphMode(1920, 1080, 16);
 	ChangeWindowMode(TRUE);
@@ -29,7 +32,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SceneMgr* Scene = new SceneMgr;
 
 	//	タイトルシーンをセット
-	Scene->SetScene(new Title);
+	Scene->SetScene(new TestSceneOno);
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
@@ -39,6 +42,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		// 描画処理
 		Scene->Draw();
+
+		// Effekseer側のカメラとDxライブラリ側のカメラを同期する
+		Effekseer_Sync3DSetting();
+		// Effekseerの更新
+		UpdateEffekseer3D();
+		// Effekseerの描画
+		DrawEffekseer3D();
 
 		// BGM処理
 		Scene->Sound();
@@ -58,4 +68,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// ソフトの終了
 	return 0;
+}
+
+/// <summary>
+/// Effekseerの初期化
+/// </summary>
+void InitializeEffekseer()
+{
+	// DXライブラリとEffekseerの初期化処理
+	if (Effekseer_Init(8000) == -1)
+	{
+		printf("Effekseer初期化に失敗！\n");			                              // エラーが起きたら直ちに終了
+	}
+
+	//---------------------------------------------------+
+	// Effekseer関連の初期化
+	//---------------------------------------------------+
+	SetUseDirect3DVersion(DX_DIRECT3D_11);                    // DirectX11を使用
+	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
+	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
+	SetUseZBuffer3D(TRUE);                                    // ZBufferを使用
+	SetWriteZBuffer3D(TRUE);                                  // ZBufferへの書き込みを許可
 }
