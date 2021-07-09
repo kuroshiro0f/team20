@@ -68,7 +68,7 @@ SceneBase* Title::Update()
 	
 	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
 	{
-		return new Game;
+		return new TestSceneUeyama;
 	}
 	return this;
 }

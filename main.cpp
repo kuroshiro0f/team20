@@ -63,6 +63,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// シーンを削除
 	delete(Scene);
 
+	// Effekseerの後始末
+	Effkseer_End();
+
 	// ＤＸライブラリの後始末
 	DxLib_End();
 

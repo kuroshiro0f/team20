@@ -148,7 +148,7 @@ void Result::Draw()
 	}
 	if (m_checkResultFlag >= 3)
 	{
-		DrawGraph(0, 0, m_evaluationGraphHandle[0], TRUE);				//	リザルト画面のロゴを表示
+		DrawGraph(0, 0, m_evaluationGraphHandle[m_evaluation], TRUE);				//	リザルト画面のロゴを表示
 	}
 	/*DrawString(0, 0, "リザルト", GetColor(255, 255, 255));*/
 }
