@@ -37,14 +37,20 @@ public:
 	void SetDir(const VECTOR set) { dir = set; }
 
 	// 加速(accelVec)のSetter
-	void SetAccelVec(const VECTOR& _accel) { accelVec = _accel; }
+	void SetAccel(float _accel) { m_target_accel = _accel; }
 
 	// あたり判定半径の取得.
 	float GetHitRadius() { return hitRadius; }
 
+
+
 	void SetTargetCount(int _targetCount) { m_targetCount = _targetCount; }
 	void SetSetTime(int _setTime) { m_setTime = _setTime; }
 	void SetInterval(int _interval) { m_shotInterval = _interval; }
+
+	void SetThrowSound(int _sound) { m_throwIceSoundHandle = _sound; }
+	void SetHitSound(int _sound) { m_hitIceSoundHandle = _sound; }
+	void SetMissSound(int _sound) { m_missIceSoundHandle = _sound; }
 
 	void SetHitIce(bool _hitFlag) { m_hitFlag = _hitFlag; }
 	bool GetHitIce() { return m_hitFlag; }
@@ -67,14 +73,19 @@ private:
 	int		timenow;		// 経過時間.
 	bool	m_hitFlag;
 
+	int		m_throwIceSoundHandle;
+	int		m_hitIceSoundHandle;
+	int		m_missIceSoundHandle;
+
 
 	int		m_targetCount;
 	int		m_plusX;
 	int		m_setTime;
 	int     m_shotInterval;     // エネミーを飛ばす間隔
 
+	float m_target_accel;
+
 	//	静的定数
-	static const float m_target_accel;
 	//static const float MAX_SPEED;
 	//static const float DEFAULT_DECEL;
 	//static const float BREAK_DECEL;

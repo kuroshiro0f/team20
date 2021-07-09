@@ -10,12 +10,13 @@ const int Target::m_target_X = 400;
 //const int Target::m_target_X = 0;
 const int Target::m_target_Y = 10;
 const int Target::m_target_Z = 0;
-const float Target::m_target_accel = 0.1f;
 
 const int Target::m_font_X = 1340;
 const int Target::m_font_Y = 160;
 const int Target::m_font_size = 50;
 const int Target::m_font_thick = -1;
+
+
 
 //-----------------------------------------------------------------------------
 // @brief  コンストラクタ.
@@ -30,12 +31,15 @@ Target::Target()
 	,m_shotInterval(5)
 	, m_iceState(NO_SHOT)
 	, m_hitFlag(false)
+	, m_throwIceSoundHandle(-1)
+	, m_hitIceSoundHandle(-1)
 {
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/target/icecream/SVH-icecream/icecream.pmx");
 	m_FontHandle = CreateFontToHandle(NULL, m_font_size, m_font_thick, DX_FONTTYPE_NORMAL);
 
-	
+	m_target_accel = 0.1f;
+
 	// posはVector型なので、VGetで原点にセット
 	pos = VGet(m_target_X, m_target_Y, m_target_Z);
 	// 移動する力を（すべての座標）ゼロにする
@@ -67,6 +71,7 @@ void Target::Update()
 	if (m_iceState == NOW_SHOT)
 	{
 		accelVec = VScale(dir, m_target_accel);
+		
 	}
 	
 
@@ -117,7 +122,8 @@ void Target::Draw()
 	{
 		int timebuffer = GetNowCount() / 1000;
 		
-		DrawFormatStringToHandle(m_font_X, m_font_Y, GetColor(255, 255, 255),m_FontHandle, "%d", (m_shotInterval + 1) - (timebuffer - m_setTime));
+		DrawFormatStringToHandle(m_font_X, m_font_Y, GetColor(255, 255, 255),m_FontHandle, "%d"
+			, (m_shotInterval + 1) - (timebuffer - m_setTime));
 	}
 
 	// デバッグあたり判定.
@@ -138,6 +144,8 @@ void Target::Reaction(UI* _ui, bool _hitFlag)
 
 		ScoreUpdateUI(*_ui, _hitFlag);
 
+		PlaySoundMem(m_hitIceSoundHandle, DX_PLAYTYPE_BACK);
+
 		// ３Dモデルのポジション設定
 		MV1SetPosition(modelHandle, pos);
 		m_iceState = END_SHOT;
@@ -148,6 +156,8 @@ void Target::Reaction(UI* _ui, bool _hitFlag)
 			pos = VGet(200, 100, 200);
 
 			ScoreUpdateUI(*_ui, _hitFlag);
+
+			PlaySoundMem(m_missIceSoundHandle, DX_PLAYTYPE_BACK);
 
 			// ３Dモデルのポジション設定
 			MV1SetPosition(modelHandle, pos);

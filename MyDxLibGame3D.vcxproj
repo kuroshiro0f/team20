@@ -179,8 +179,14 @@
     <ClCompile Include="SceneMgr.cpp" />
     <ClCompile Include="Target.cpp" />
     <ClCompile Include="TestSceneKoga.cpp" />
-    <ClCompile Include="TestSceneOno.cpp" />
-    <ClCompile Include="TestSceneUeyama.cpp" />
+    <ClCompile Include="TestSceneOno.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="TestSceneUeyama.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="TestScene_fujihara.cpp" />
     <ClCompile Include="TestTitleSceneOno.cpp" />
     <ClCompile Include="Title.cpp" />
