@@ -148,7 +148,6 @@ void TestTitleScene::Draw()
 	// 透過量更新
 	UpdateTransparent();
 
-
 	// バックグラウンド
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);
 
