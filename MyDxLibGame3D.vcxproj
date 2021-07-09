@@ -179,6 +179,7 @@
     <ClCompile Include="TestSceneOno.cpp" />
     <ClCompile Include="TestSceneUeyama.cpp" />
     <ClCompile Include="TestScene_fujihara.cpp" />
+    <ClCompile Include="TestTitleSceneOno.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="UI.cpp" />
   </ItemGroup>
@@ -201,6 +202,7 @@
     <ClInclude Include="TestSceneOno.h" />
     <ClInclude Include="TestSceneUeyama.h" />
     <ClInclude Include="TestScene_fujihara.h" />
+    <ClInclude Include="TestTitleSceneOno.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="UI.h" />
   </ItemGroup>
