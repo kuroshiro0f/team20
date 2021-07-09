@@ -27,7 +27,7 @@ Player::Player()
 	 , hitRadius(5.0f)
 {
 	// サウンドの読み込み
-	m_sHandle = LoadSoundMem("C:/Users/co2cr/Desktop/model_program/team_prodauction(ver.4.1)/17.MyDxLibGame3D(hit)/data/sound/player/魔王魂 効果音 落ちる02.wav");
+	m_sHandle = LoadSoundMem("data/sound/sara_shrow.wav");
 
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/sara/sara.pmx");
@@ -49,6 +49,8 @@ Player::~Player()
 {
 	// モデルのアンロード.
 	MV1DeleteModel(modelHandle);
+	// サウンドのアンロード
+	DeleteSoundMem(m_sHandle);
 }
 
 //-----------------------------------------------------------------------------
@@ -75,7 +77,7 @@ void Player::Update()
 	}
 
 	// z座標が215を超えたら所定の位置に戻る
-	if (VSize(pos) > VSize(VGet(0, 0, 215)))
+	if (VSize(pos) > VSize(VGet(0, 0, 2150)))
 	{
 		// キーが押されていない状態にする
 		KeyPush = false;
