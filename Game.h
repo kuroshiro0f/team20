@@ -21,7 +21,7 @@ public:
 
 private:
 	class Player* m_player;			//	プレイヤークラスへのポインタメンバ変数
-	class Target* m_target[10];			//
+	class Target* m_target[11];			//
 	class Camera* m_camera;			//	カメラクラスへのポインタメンバ変数
 	class Mark* m_mark;				//	マーククラスへのポインタメンバ変数
 	class UI* m_score_ui[10];		//  UIクラスへのポインタメンバ変数

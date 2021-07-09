@@ -137,7 +137,7 @@ void Target::Reaction(bool _hitFlag)
 	case false:
 		if (pos.x < -500 || pos.x > 500 && m_iceState == NOW_SHOT)
 		{
-			pos = VGet(0, 100, 0);
+			pos = VGet(200, 100, 200);
 			// ３Dモデルのポジション設定
 			MV1SetPosition(modelHandle, pos);
 			m_iceState = END_SHOT;

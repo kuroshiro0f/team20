@@ -77,7 +77,7 @@ SceneBase* TestSceneUeyama::Update()
 	if (GetNowCount() / 1000 - m_startTime > 3)
 	{
 		m_startTime = GetNowCount() / 1000;
-		m_target[m_targetCount]->SetIsShot(true);
+		m_target[m_targetCount]->SetIceState(Target_State::NOW_SHOT);
 		m_targetCount++;
 	}
 
@@ -100,7 +100,7 @@ SceneBase* TestSceneUeyama::Update()
 	if (m_finishFlag == TRUE)
 	{
 		WaitTimer(3000);
-		return new Result;				//	リザルトシーンに切り替える
+		return new Result(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
 	}
 	return this;						//	ゲームシーンを表示し続ける
 }
@@ -114,9 +114,9 @@ void TestSceneUeyama::Draw()
 		m_target[i]->Draw();
 	}
 	m_player->Draw();
-	if (m_target[enemyNum - 1]->GetEndShot())
+	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
-		DrawGraph(0, 0, m_finishGraphHandle, TRUE);							//	タイトル画面の背景を表示
+		DrawGraph(0, 0, m_finishGraphHandle, TRUE);							//	最後のエネミーが射出され終わったら"ゲーム終了"の表示
 	}
 	for (int i = 0; i < enemyNum; ++i)
 	{
@@ -132,7 +132,7 @@ void TestSceneUeyama::Draw()
 
 void TestSceneUeyama::Sound()
 {
-	if (m_target[enemyNum - 1]->GetEndShot())
+	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
 		StopSoundMem(m_soundHandle);
 		PlaySoundMem(m_finishSoundHandle, DX_PLAYTYPE_BACK, FALSE);

@@ -9,7 +9,7 @@
 #include "Camera.h"
 
 #include "DxLib.h"
-
+#include "Effect.h"
 #include "TestScene_fujihara.h"
 
 static int enemyNum = 10;
@@ -34,6 +34,9 @@ Game::Game()
 		m_score_ui[i] = nullptr;
 		m_hit_ui[i] = nullptr;
 	}
+	m_target[enemyNum] = nullptr;
+
+	// 開始時のタイムを取得
 	m_startTime = GetNowCount() / 1000;
 }
 
@@ -53,7 +56,7 @@ Game::~Game()
 		delete m_score_ui[i];		//  スコアUIへのポインタメンバ変数
 		delete m_hit_ui[i];			//	ヒット判定UIへのポインタメンバ変数
 	}
-
+	delete m_target[enemyNum];
 }
 
 SceneBase* Game::Update()
@@ -67,27 +70,52 @@ SceneBase* Game::Update()
 	// 机の更新
 	m_mark->Mark_Update();
 
+	if (m_targetCount == 0)
+	{
+		m_target[m_targetCount]->SetSetTime(m_startTime);
+	}
+
+
 	// エネミー射出管理
-	if (GetNowCount() / 1000 - m_startTime > 1)
+	if (GetNowCount() / 1000 - m_startTime > 5)
 	{
 		m_startTime = GetNowCount() / 1000;
-		m_target[m_targetCount]->SetIceState(NOW_SHOT);
-		m_targetCount++;
+		if (m_target[m_targetCount]->GetIceState() == NO_SHOT)
+		{
+			m_target[m_targetCount]->SetIceState(NOW_SHOT);
+		}
+		if (m_target[m_targetCount]->GetIceState() == END_SHOT)
+		{
+			m_target[m_targetCount + 1]->SetSetTime(m_startTime);
+			m_targetCount++;
+		}
 	}
 
 	// 現在の番号に応じてエネミーの更新
-	for (int i = 0; i < m_targetCount; i++)
-	{
-		m_target[i]->Update();
-	}
+	//for (int i = 0; i < m_targetCount; i++)
+	//{
+	m_target[m_targetCount]->Update();
+	m_target[m_targetCount]->SetTargetCount(m_targetCount);
+	m_target[m_targetCount]->Reaction(HitChecker::Check(*m_player, *m_target[m_targetCount]));
+
+	//}
 	m_player->Update();
 
-	//m_camera->Update(*m_player);
-	for (int i = 0; i < m_targetCount; i++)
-	{
-		HitChecker::Check(*m_player, *m_target[i]);
-	}
-	if (m_targetCount > enemyNum)	//	エンターが押されたら
+	m_camera->Update(*m_player);
+
+	// 当たり判定によるスコアの更新処理
+	//if (HitChecker::Check(*m_player, *m_target[m_targetCount - 1]))
+	//{
+	//	m_hit_ui[m_targetCount - 1]->ScoreUpdate(m_hit_ui[m_targetCount - 1], true);
+	//}
+	//if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
+	//{
+	//	m_hit_ui[m_targetCount - 1]->ScoreUpdate(m_hit_ui[m_targetCount - 1], false);
+	//}
+
+
+
+	if (m_targetCount == enemyNum)	//	エンターが押されたら
 	{
 		m_finishFlag = TRUE;
 	}
@@ -105,20 +133,20 @@ void Game::Draw()
 {
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);							//	タイトル画面の背景を表示
 	m_mark->Mark_Draw();
-	for (int i = 0; i < m_targetCount; i++)
+	for (int i = 0; i <= m_targetCount; i++)
 	{
 		m_target[i]->Draw();
 	}
 	m_player->Draw();
-	if (m_finishFlag == TRUE)
+	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
-		DrawGraph(0, 0, m_finishGraphHandle, TRUE);							//	タイトル画面の背景を表示
+		DrawGraph(0, 0, m_finishGraphHandle, TRUE);							//	最後のエネミーが射出され終わったら"ゲーム終了"の表示
 	}
 	for (int i = 0; i < enemyNum; ++i)
 	{
 		m_score_ui[i]->Draw();
 	}
-	for (int i = 0; i < m_hitCount; ++i)
+	for (int i = 0; i < enemyNum; ++i)
 	{
 		m_hit_ui[i]->Draw();
 	}
@@ -128,7 +156,7 @@ void Game::Draw()
 
 void Game::Sound()
 {
-	if (m_finishFlag == TRUE)
+	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
 		StopSoundMem(m_soundHandle);
 		PlaySoundMem(m_finishSoundHandle, DX_PLAYTYPE_BACK, FALSE);
@@ -155,6 +183,8 @@ void Game::Load()
 	{
 		m_target[i] = new Target;
 	}
+	m_target[enemyNum] = new Target();
+
 	for (int i = 0; i < 2; ++i)
 	{
 		for (int j = 0; j < 5; ++j)

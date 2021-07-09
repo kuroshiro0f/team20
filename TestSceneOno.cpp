@@ -77,7 +77,7 @@ SceneBase* TestSceneOno::Update()
 	if (GetNowCount() / 1000 - m_startTime > 1)
 	{
 		m_startTime = GetNowCount() / 1000;
-		m_target[m_targetCount]->SetIsShot(true);
+		m_target[m_targetCount]->SetIceState(Target_State::NOW_SHOT);
 		m_targetCount++;
 	}
 
@@ -100,7 +100,7 @@ SceneBase* TestSceneOno::Update()
 	if (m_finishFlag == TRUE)
 	{
 		WaitTimer(3000);
-		return new Result;				//	リザルトシーンに切り替える
+		return new Result(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
 	}
 	return this;						//	ゲームシーンを表示し続ける
 }

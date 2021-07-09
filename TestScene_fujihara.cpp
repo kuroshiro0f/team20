@@ -76,7 +76,7 @@ SceneBase* TestScene_fujihara::Update()
 	if (GetNowCount() / 1000 - m_startTime > 1)
 	{
 		m_startTime = GetNowCount() / 1000;
-		m_target[m_targetCount]->SetIsShot(true);
+		m_target[m_targetCount]->SetIceState(Target_State::NOW_SHOT);
 		m_targetCount++;
 
 	}
@@ -89,11 +89,13 @@ SceneBase* TestScene_fujihara::Update()
 	m_player->Update();
 
 	m_camera->Update(*m_player);
+
+	// 当たり判定によるスコアの更新処理
 	if (HitChecker::Check(*m_player, *m_target[m_targetCount-1]))
 	{
 		m_hit_ui[m_targetCount-1]->ScoreUpdate(m_hit_ui[m_targetCount-1], true);
 	}
-	if (m_target[m_targetCount-1]->GetEndShot() == true)
+	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
 		m_hit_ui[m_targetCount-1]->ScoreUpdate(m_hit_ui[m_targetCount-1], false);
 	}
