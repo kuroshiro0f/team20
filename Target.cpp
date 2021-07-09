@@ -1,6 +1,7 @@
 #include "Target.h"
 #include "ObstructBase.h"
 #include "TestSceneKoga.h"
+#include "Hitchecker.h"
 
 // 静的定数.
 const int Target::m_target_X = 400;
@@ -9,6 +10,11 @@ const int Target::m_target_Y = 10;
 const int Target::m_target_Z = 0;
 const float Target::m_target_accel = 0.1f;
 
+const int Target::m_font_X = 1340;
+const int Target::m_font_Y = 160;
+const int Target::m_font_size = 50;
+const int Target::m_font_thick = -1;
+
 //-----------------------------------------------------------------------------
 // @brief  コンストラクタ.
 //-----------------------------------------------------------------------------
@@ -16,12 +22,16 @@ Target::Target()
 	: modelHandle(-1)
 	, hitRadius(5.0f)
 	, timenow(0)
-	, m_isShot(false)
-	, m_endShot(false)
+	, m_targetCount(0)
+	, m_plusX(0)
+	, m_setTime(0) 
+	, m_iceState(NO_SHOT)
 {
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/target/icecream/SVH-icecream/icecream.pmx");
+	m_FontHandle = CreateFontToHandle(NULL, m_font_size, m_font_thick, DX_FONTTYPE_NORMAL);
 
+	
 	// posはVector型なので、VGetで原点にセット
 	pos = VGet(m_target_X, m_target_Y, m_target_Z);
 	// 移動する力を（すべての座標）ゼロにする
@@ -44,17 +54,15 @@ Target::~Target()
 //-----------------------------------------------------------------------------
 void Target::Update()
 {
-	VECTOR accelVec = VGet(0, 0, 0);
-	
+	if (m_iceState==END_SHOT)
+	{
+		return;
+	}
+	accelVec = VGet(0, 0, 0);
 	//	アイス射出フラグがtrueになったら
-	if (m_isShot)
+	if (m_iceState == NOW_SHOT)
 	{
 		accelVec = VScale(dir, m_target_accel);
-		if (pos.x < -500 || pos.x > 500 && !m_endShot)
-		{
-			accelVec = VGet(0, 0, 0);
-			m_endShot = true;
-		}
 	}
 	
 
@@ -95,11 +103,51 @@ void Target::Draw()
 {
 	// 元モデルでは小さすぎるので描画倍率を設定
 	MV1SetScale(modelHandle, VGet(3.0f, 3.0f, 3.0f));
-	// ３Ｄモデルの描画
-	MV1DrawModel(modelHandle);
+	if (m_iceState != NO_SHOT)
+	{
+		// ３Ｄモデルの描画
+		MV1DrawModel(modelHandle);
+	}
+	
+	if (m_iceState == NO_SHOT)
+	{
+		int timebuffer = GetNowCount() / 1000;
+		
+		DrawFormatStringToHandle(m_font_X, m_font_Y, GetColor(255, 255, 255),m_FontHandle, "%d", 4-(timebuffer - m_setTime));
+	}
 
 	// デバッグあたり判定.
 	//DrawSphere3D(pos, hitRadius, 5, 0x00ffff, 0x00ffff, false);
+}
+
+//-----------------------------------------------------------------------------
+// @brief  リアクション.
+//-----------------------------------------------------------------------------
+void Target::Reaction(bool _hitFlag)
+{
+	switch (_hitFlag)
+	{
+	case true:
+		m_plusX = 20 + m_targetCount * 10;
+		pos = VGet(m_plusX, 10, 20);
+		// ３Dモデルのポジション設定
+		MV1SetPosition(modelHandle, pos);
+		m_iceState = END_SHOT;
+		break;
+	case false:
+		if (pos.x < -500 || pos.x > 500 && m_iceState == NOW_SHOT)
+		{
+			pos = VGet(0, 100, 0);
+			// ３Dモデルのポジション設定
+			MV1SetPosition(modelHandle, pos);
+			m_iceState = END_SHOT;
+		}
+		break;
+	}
+
+
+
+	
 }
 
 //-----------------------------------------------------------------------------

@@ -71,7 +71,7 @@ SceneBase* Game::Update()
 	if (GetNowCount() / 1000 - m_startTime > 1)
 	{
 		m_startTime = GetNowCount() / 1000;
-		m_target[m_targetCount]->SetIsShot(true);
+		m_target[m_targetCount]->SetIceState(NOW_SHOT);
 		m_targetCount++;
 	}
 
