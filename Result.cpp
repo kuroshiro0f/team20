@@ -9,33 +9,36 @@ const int RESULT_NUM = 3;
 const int NICE_P = 5;
 const int PF_P = 10;
 
-Result::Result()
-	:m_score(10)
+// 最大透過量
+const int defaultTrans = 122;
+// 透過量変化用ベクトル
+const int transModeration = -1;
+
+Result::Result(const int &_score)
+	:m_score(_score)
 {
-	//	スコアによってグラフィックハンドルにリザルト画面のイメージと効果音をセット
 	if (m_score < NICE_P)
 	{
 		m_evaluation = 0;
-		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/NEVERGIVEUP.png");		
-		m_evaluationSoundHandle[m_evaluation] = LoadSoundMem("data/sound/NGU.mp3");			
+		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/NEVERGIVEUP.png");		//	グラフィックハンドルにリザルト画面のイメージをセット
+		m_evaluationSoundHandle[m_evaluation] = LoadSoundMem("data/sound/NGU.mp3");			//	サウンドハンドルにリザルト画面の効果音をセット
 	}
 	if (m_score >= NICE_P && m_score < PF_P)
 	{
 		m_evaluation = 1;
-		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/NICE.png");				
-		m_evaluationSoundHandle[m_evaluation] = LoadSoundMem("data/sound/NICE.mp3");		
+		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/NICE.png");				//	グラフィックハンドルにリザルト画面のイメージをセット
+		m_evaluationSoundHandle[m_evaluation] = LoadSoundMem("data/sound/NICE.mp3");		//	サウンドハンドルにリザルト画面の効果音をセット
 	}
 	if (m_score == PF_P)
 	{
 		m_evaluation = 2;
-		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/PERFECT.png");			
-		m_evaluationSoundHandle[m_evaluation] = LoadSoundMem("data/sound/PF.mp3");			
+		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/PERFECT.png");			//	グラフィックハンドルにリザルト画面のイメージをセット
+		m_evaluationSoundHandle[m_evaluation] = LoadSoundMem("data/sound/PF.mp3");			//	サウンドハンドルにリザルト画面の効果音をセット
 	}
 	/*m_scoreStr(std::to_string(m_score));*/
-	//	グラフィックハンドルにリザルト画面のイメージをセット
-	m_logoGraphHandle = LoadGraph("data/img/Result_logo.png");				
-	m_scoreGraphHandle = LoadGraph("data/img/Result_score.png");			
-	m_guidanceGraphHandle = LoadGraph("data/img/Result_guidance.png");		
+	m_logoGraphHandle = LoadGraph("data/img/Result_logo.png");				//	グラフィックハンドルにリザルト画面のイメージをセット
+	m_scoreGraphHandle = LoadGraph("data/img/Result_score.png");			//	グラフィックハンドルにリザルト画面のイメージをセット
+	m_guidanceGraphHandle = LoadGraph("data/img/Result_guidance.png");		//	グラフィックハンドルにリザルト画面のイメージをセット
 	m_numGraphHandle[0] = LoadGraph("data/img/0.png");
 	m_numGraphHandle[1] = LoadGraph("data/img/1.png");
 	m_numGraphHandle[2] = LoadGraph("data/img/2.png");
@@ -47,10 +50,15 @@ Result::Result()
 	m_numGraphHandle[8] = LoadGraph("data/img/8.png");
 	m_numGraphHandle[9] = LoadGraph("data/img/9.png");
 	m_numGraphHandle[10] = LoadGraph("data/img/10.png");
-	//	サウンドハンドルにリザルト画面のBGMをセット
-	//m_bgmSoundHandle = LoadSoundMem("");									
-	m_scoreSoundHandle = LoadSoundMem("data/sound/score.mp3");				
-	m_numSoundHandle = LoadSoundMem("data/sound/num.mp3");					
+	//m_bgmSoundHandle = LoadSoundMem("");									//	サウンドハンドルにリザルト画面のBGMをセット
+	m_scoreSoundHandle = LoadSoundMem("data/sound/score.mp3");				//	サウンドハンドルにリザルト画面の効果音をセット
+	m_numSoundHandle = LoadSoundMem("data/sound/num.mp3");					//	サウンドハンドルにリザルト画面の効果音をセット
+
+	// 透過量変数を122に設定
+	transParent = defaultTrans;
+	// 毎透過量変数を１に設定
+	permeationAmount = 1;
+
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
 		m_checkKeyFlag = TRUE;
@@ -94,6 +102,26 @@ SceneBase* Result::Update()
 	{
 		m_checkKeyFlag = FALSE;
 	}
+
+	// 透過量が122より大きくなったら
+	if (transParent >= defaultTrans)
+	{
+		// 透過量を121に設定
+		transParent = 121;
+		// 毎透過量を-1にする
+		permeationAmount *= transModeration;
+	}
+	// 透過量が0より小さければ
+	else if (0 >= transParent)
+	{
+		// 透過量を１に設定
+		transParent = 1;
+		// 毎透過量を1にする
+		permeationAmount *= transModeration;
+	}
+	// 毎透過量を透過量に加算する
+	transParent += permeationAmount;
+
 	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
 	{
 		return new Title;
@@ -104,7 +132,12 @@ SceneBase* Result::Update()
 void Result::Draw()
 {
 	DrawGraph(LOGO_X, LOGO_Y, m_logoGraphHandle, TRUE);					//	リザルト画面のロゴを表示
+
+	// 透過して描画
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, transParent);
 	DrawGraph(GUIDANCE_X, GUIDANCE_Y, m_guidanceGraphHandle, TRUE);		//	リザルト画面のロゴを表示
+	// 透過を元に戻す
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	if (m_checkResultFlag >= 1)
 	{
 		DrawGraph(0, 0, m_scoreGraphHandle, TRUE);						//	リザルト画面のロゴを表示
@@ -115,7 +148,7 @@ void Result::Draw()
 	}
 	if (m_checkResultFlag >= 3)
 	{
-		DrawGraph(0, 0, m_evaluationGraphHandle[m_evaluation], TRUE);				//	リザルト画面のロゴを表示
+		DrawGraph(0, 0, m_evaluationGraphHandle[0], TRUE);				//	リザルト画面のロゴを表示
 	}
 	/*DrawString(0, 0, "リザルト", GetColor(255, 255, 255));*/
 }

@@ -21,6 +21,11 @@ private:
 	int m_logoGraphHandle;				//	タイトル画面・ロゴのグラフィックハンドル
 	int m_guidanceGraphHandle;			//	タイトル画面・ガイドのグラフィックハンドル
 	int m_soundHandle;					//	タイトル画面・サウンドハンドル
+	// 毎透過量
+	int permeationAmount;
+	// 透過量
+	int transParent;
+
 	bool m_checkKeyFlag;				//	キーが押されたままかを判定するフラグ
 };
 

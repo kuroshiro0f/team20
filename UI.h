@@ -16,7 +16,9 @@ public:
 	void UI::ScoreUpdate(UI* _scoreUi, bool _hitOrMiss);
 	// 描画
 	void UI::Draw();
-	// モデルのハンドル
+	// getter
+	int GetScore() { return m_score; }
+
 private:
 	// 操作説明画像ハンドル
 	static int m_help_graphHandle;
@@ -26,6 +28,9 @@ private:
 	static int m_hit_graphHandle;
 	// 外れた時の画像ハンドル
 	static int m_miss_graphHandle;
+
+	// スコア保存用変数
+	static int m_score;
 
 	// スコアの座標
 	int m_posX;
