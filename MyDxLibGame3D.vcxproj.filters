@@ -73,6 +73,15 @@
     <ClCompile Include="TestTitleSceneOno.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="GameScene_easy.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene_normal.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene_hard.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -130,6 +139,15 @@
       <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="TestTitleSceneOno.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene_easy.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene_hard.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene_normal.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>

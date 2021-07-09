@@ -1,5 +1,5 @@
 #include "Result.h"
-#include "Title.h"
+#include "TestTitleSceneOno.h"
 
 const int LOGO_X = 0;
 const int LOGO_Y = 0;
@@ -129,7 +129,7 @@ SceneBase* Result::Update()
 	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
 	{
 		PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);		//	âπÇ™çƒê∂ÇµèIÇÌÇÈÇ‹Ç≈ë“ã@
-		return new Title;
+		return new TestTitleScene;
 	}
 	return this;
 }

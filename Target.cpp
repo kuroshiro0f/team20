@@ -62,7 +62,7 @@ void Target::Update()
 	{
 		return;
 	}
-	accelVec = VGet(0, 0, 0);
+	 accelVec = VGet(0, 0, 0);
 	//	アイス射出フラグがtrueになったら
 	if (m_iceState == NOW_SHOT)
 	{

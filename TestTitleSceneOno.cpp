@@ -1,9 +1,12 @@
 #include "TestTitleSceneOno.h"
 #include "DxLib.h"
 #include "Game.h"
+#include "GameScene_easy.h"
+#include "GameScene_normal.h"
+#include "GameScene_hard.h"
 
 // 最大透過量
-const int MAX_TRANSP_VAL = 122;
+const int MAX_TRANSP_VAL = 255;
 // 透過量変化用ベクトル
 const int TRANSP_MODERATION = -1;
 
@@ -115,19 +118,19 @@ SceneBase* TestTitleScene::Update()
 			if (m_cursolNum == 0)
 			{
 				// イージーモードシーンのインスタンスを返す
-				return new Game();
+				return new GameSceneEasy();
 			}
 
 			if (m_cursolNum == 1)
 			{
 				// ノーマルモードのインスタンスを返す
-				return new Game();
+				return new GameSceneNormal();
 			}
 
 			if (m_cursolNum == 2)
 			{
 				// ハードモードのインスタンスを返す
-				return new Game();
+				return new GameSceneHard();
 			}
 		}
 
@@ -249,16 +252,16 @@ void TestTitleScene::UpdateTransparent()
 	// 透過量が122より大きくなったら
 	if (m_transpVal >= MAX_TRANSP_VAL)
 	{
-		// 透過量を121に設定
-		m_transpVal = 121;
+		// 透過量を255に設定
+		m_transpVal = MAX_TRANSP_VAL - 1;
 		// 毎透過量を-1にする
 		m_permeationAmount *= TRANSP_MODERATION;
 	}
 	// 透過量が0より小さければ
-	else if (0 >= m_transpVal)
+	else if (MAX_TRANSP_VAL / 2 >= m_transpVal)
 	{
-		// 透過量を１に設定
-		m_transpVal = 1;
+		// 透過量を設定
+		m_transpVal = MAX_TRANSP_VAL / 2 + 1;
 		// 毎透過量を1にする
 		m_permeationAmount *= TRANSP_MODERATION;
 	}

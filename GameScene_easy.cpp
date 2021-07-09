@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "GameScene_easy.h"
 #include "Result.h"
 #include "Mark.h"
 #include "Target.h"
@@ -20,10 +20,10 @@ static int LADY_MIN_Y = -75;
 // ターゲットが飛んでくる間隔 (秒単位)
 const int TARGET_SHOT_INTERVAL = 3;
 
-Game::Game()
+GameSceneEasy::GameSceneEasy()
 	:m_player(nullptr)
-	,m_camera(nullptr)
-	,m_mark(nullptr)
+	, m_camera(nullptr)
+	, m_mark(nullptr)
 	, m_effect(nullptr)
 	, m_targetCount(0)
 	, m_startTime(0)
@@ -33,8 +33,8 @@ Game::Game()
 	, m_lady_Y(LADY_Y)
 	, m_girlUpFlag(true)
 	//　確認用
-	,m_hitCount(0)
-	,m_hitFlag(false)
+	, m_hitCount(0)
+	, m_hitFlag(false)
 {
 	// 次のシーンへ移行するかどうか
 	m_finishFlag = FALSE;
@@ -51,7 +51,7 @@ Game::Game()
 	m_startTime = GetNowCount() / 1000;
 }
 
-Game::~Game()
+GameSceneEasy::~GameSceneEasy()
 {
 	delete m_player;	//	プレイヤーのポインタメンバ変数を消去
 	delete m_camera;	//	カメラのポインタメンバ変数を消去
@@ -76,7 +76,7 @@ Game::~Game()
 	delete m_effect;
 }
 
-SceneBase* Game::Update()
+SceneBase* GameSceneEasy::Update()
 {
 
 	// デバッグビルドのみデバッグ関数を呼び出す
@@ -148,14 +148,14 @@ SceneBase* Game::Update()
 	if (m_finishFlag == TRUE)
 	{
 		// scoreUIのスコアをResultのscore変数にセット
-		
+
 		WaitTimer(3000);
 		return new Result(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
 	}
 	return this;						//	ゲームシーンを表示し続ける
 }
 
-void Game::Draw()
+void GameSceneEasy::Draw()
 {
 	// 背景
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);
@@ -199,7 +199,7 @@ void Game::Draw()
 	/*DrawString(0, 0, "ゲーム画面です", GetColor(255, 255, 255));*/
 }
 
-void Game::Sound()
+void GameSceneEasy::Sound()
 {
 	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
@@ -214,7 +214,7 @@ void Game::Sound()
 	}
 }
 
-void Game::Load()
+void GameSceneEasy::Load()
 {
 	m_finishGraphHandle = LoadGraph("data/img/gameEnd.png");		//	グラフィックハンドルにゲーム終了文字のイメージをセット
 	m_backGraphHandle = LoadGraph("data/img/gameBack.png");			//	グラフィックハンドルにゲーム画面のイメージをセッ
@@ -231,6 +231,7 @@ void Game::Load()
 	{
 		m_target[i] = new Target;
 		m_target[i]->SetInterval(TARGET_SHOT_INTERVAL);
+		// m_target[i]->SetAccelVec()
 	}
 
 	for (int i = 0; i < 2; ++i)
@@ -248,7 +249,7 @@ void Game::Load()
 
 }
 
-void Game::DebugKey()
+void GameSceneEasy::DebugKey()
 {
 	// 確認用
 	if (CheckHitKey(KEY_INPUT_A))

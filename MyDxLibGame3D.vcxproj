@@ -163,6 +163,9 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameScene_easy.cpp" />
+    <ClCompile Include="GameScene_hard.cpp" />
+    <ClCompile Include="GameScene_normal.cpp" />
     <ClCompile Include="HitChecker.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mark.cpp" />
@@ -187,6 +190,9 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameScene_easy.h" />
+    <ClInclude Include="GameScene_hard.h" />
+    <ClInclude Include="GameScene_normal.h" />
     <ClInclude Include="Hitchecker.h" />
     <ClInclude Include="Mark.h" />
     <ClInclude Include="ObstructBase.h" />
