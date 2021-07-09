@@ -32,7 +32,8 @@ private:
 	int m_logoGraphHandle;				//	タイトル画面・ロゴのグラフィックハンドル
 	int m_guidanceGraphHandle;			//	タイトル画面・ガイドのグラフィックハンドル
 	int m_soundHandle;					//	タイトル画面・サウンドハンドル
-	// 毎フレーム透過量
+	int m_click_sound_handle;			//  ENTERで進むときのサウンドハンドル
+										// 毎フレーム透過量
 	int m_permeationAmount;
 	// 透過量
 	int m_transpVal;

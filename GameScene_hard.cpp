@@ -16,6 +16,8 @@ static int GIRL_Y = 0;
 static int LADY_Y = 0;
 static int GIRL_MIN_Y = -75;
 static int LADY_MIN_Y = -75;
+static int COUNTDOWN = 6;
+static int GONG_VOLUME_PAL = 30;
 
 // ターゲットが飛んでくる間隔 (秒単位)
 const int TARGET_SHOT_INTERVAL = 0;
@@ -49,6 +51,8 @@ GameSceneHard::GameSceneHard()
 
 	// 開始時のタイムを取得
 	m_startTime = GetNowCount() / 1000;
+	// ステートセット(カウントダウンから)
+	m_state = GAME_SCENE_STATE::COUNTDOWN;
 }
 
 GameSceneHard::~GameSceneHard()
@@ -64,6 +68,9 @@ GameSceneHard::~GameSceneHard()
 	DeleteGraph(m_ladyGraphHandle);
 	DeleteSoundMem(m_soundHandle);
 	DeleteSoundMem(m_finishSoundHandle);
+	DeleteSoundMem(m_iceSoundHandle);
+	DeleteSoundMem(m_missSoundHandle);
+	DeleteSoundMem(m_hitSoundHandle);
 	for (int i = 0; i < enemyNum; i++)
 	{
 		delete m_target[i];
@@ -84,75 +91,90 @@ SceneBase* GameSceneHard::Update()
 	DebugKey();
 #endif
 
-	// 机の更新
-	m_mark->Mark_Update();
 
-	if (m_targetCount == 0)
+	switch (m_state)
 	{
-		m_target[m_targetCount]->SetSetTime(m_startTime);
-	}
-
-
-	// エネミー射出管理
-	if (GetNowCount() / 1000 - m_startTime > TARGET_SHOT_INTERVAL)
-	{
-		m_startTime = GetNowCount() / 1000;
-		if (m_target[m_targetCount]->GetIceState() == NO_SHOT)
+	case GAME_SCENE_STATE::COUNTDOWN:
+		if ((COUNTDOWN + 1) - (GetNowCount() / 1000 - m_startTime) <= 1)
 		{
-			m_target[m_targetCount]->SetIceState(NOW_SHOT);
+			m_startTime = GetNowCount() / 1000;
+			m_state = GAME_SCENE_STATE::GAME;
 		}
-		if (m_target[m_targetCount]->GetIceState() == END_SHOT)
+		break;
+	case GAME_SCENE_STATE::GAME:
+		// 机の更新
+		m_mark->Mark_Update();
+
+		if (m_targetCount == 0)
 		{
-			m_target[m_targetCount + 1]->SetSetTime(m_startTime);
-			m_targetCount++;
+			m_target[m_targetCount]->SetSetTime(m_startTime);
 		}
-	}
-
-	// 現在の番号に応じてエネミーの更新
-	m_target[m_targetCount]->Update();
-	m_target[m_targetCount]->SetTargetCount(m_targetCount);
-	m_iceHitFlagBuffer = HitChecker::Check(*m_player, *m_target[m_targetCount]);
-	m_target[m_targetCount]->Reaction(m_hit_ui[m_targetCount], m_iceHitFlagBuffer);
-
-	m_player->Update();
-
-	m_camera->Update(*m_player);
 
 
-	// UIの中華娘を動かす
-	if (m_girlUpFlag)
-	{
-		m_girl_Y--;
-		if (m_girl_Y < GIRL_MIN_Y)
+		// エネミー射出管理
+		if (GetNowCount() / 1000 - m_startTime > TARGET_SHOT_INTERVAL)
 		{
-			m_girl_Y = GIRL_MIN_Y;
-			m_girlUpFlag = false;
+			m_startTime = GetNowCount() / 1000;
+			if (m_target[m_targetCount]->GetIceState() == NO_SHOT)
+			{
+				m_target[m_targetCount]->SetIceState(NOW_SHOT);
+				PlaySoundMem(m_iceSoundHandle, DX_PLAYTYPE_BACK);
+				ChangeVolumeSoundMem(m_volumePal + 20, m_iceSoundHandle);
+			}
+			if (m_target[m_targetCount]->GetIceState() == END_SHOT)
+			{
+				m_target[m_targetCount + 1]->SetSetTime(m_startTime);
+				m_targetCount++;
+			}
 		}
-	}
-	else if (!m_girlUpFlag)
-	{
-		m_girl_Y++;
-		if (m_girl_Y > 0)
+
+		// 現在の番号に応じてエネミーの更新
+		m_target[m_targetCount]->Update();
+		m_target[m_targetCount]->SetTargetCount(m_targetCount);
+		m_iceHitFlagBuffer = HitChecker::Check(*m_player, *m_target[m_targetCount]);
+		m_target[m_targetCount]->Reaction(m_hit_ui[m_targetCount], m_iceHitFlagBuffer);
+
+		m_player->Update();
+
+		m_camera->Update(*m_player);
+
+
+		// UIの中華娘を動かす
+		if (m_girlUpFlag)
 		{
-			m_girl_Y = 0;
-			m_girlUpFlag = true;
+			m_girl_Y--;
+			if (m_girl_Y < GIRL_MIN_Y)
+			{
+				m_girl_Y = GIRL_MIN_Y;
+				m_girlUpFlag = false;
+			}
 		}
+		else if (!m_girlUpFlag)
+		{
+			m_girl_Y++;
+			if (m_girl_Y > 0)
+			{
+				m_girl_Y = 0;
+				m_girlUpFlag = true;
+			}
+		}
+
+
+
+		if (m_targetCount == enemyNum)
+		{
+			m_finishFlag = TRUE;
+		}
+		if (m_finishFlag == TRUE)
+		{
+			// scoreUIのスコアをResultのscore変数にセット
+			return new Result(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
+		}
+		break;
+	default:
+		break;
 	}
-
-
-
-	if (m_targetCount == enemyNum)	//	エンターが押されたら
-	{
-		m_finishFlag = TRUE;
-	}
-	if (m_finishFlag == TRUE)
-	{
-		// scoreUIのスコアをResultのscore変数にセット
-
-		WaitTimer(3000);
-		return new Result(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
-	}
-	return this;						//	ゲームシーンを表示し続ける
+	return this;						//	ゲームシーンを表示し続ける}
 }
 
 void GameSceneHard::Draw()
@@ -195,6 +217,13 @@ void GameSceneHard::Draw()
 		m_target[m_targetCount]->SetHitIce(false);
 	}
 
+	// カウントダウンの描画
+	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
+	{
+		int Count = (COUNTDOWN)-(GetNowCount() / 1000 - m_startTime);
+		DrawExtendFormatString(960, 540, 10.0, 10.0, GetColor(255, 0, 0), "%d", Count);
+	}
+
 	/*m_obstructManager->Draw();*/
 	/*DrawString(0, 0, "ゲーム画面です", GetColor(255, 255, 255));*/
 }
@@ -205,7 +234,7 @@ void GameSceneHard::Sound()
 	{
 		StopSoundMem(m_soundHandle);
 		PlaySoundMem(m_finishSoundHandle, DX_PLAYTYPE_BACK, FALSE);
-		ChangeVolumeSoundMem(m_volumePal, m_finishSoundHandle);
+		ChangeVolumeSoundMem(m_volumePal + GONG_VOLUME_PAL, m_finishSoundHandle);
 	}
 	if (m_finishFlag == FALSE)
 	{
@@ -223,15 +252,61 @@ void GameSceneHard::Load()
 	m_girlGraphHandle = LoadGraph("data/img/chinaGirl.png");
 	m_ladyGraphHandle = LoadGraph("data/img/chinaLady.png");
 	m_manualGraphHandle = LoadGraph("data/img/manual.png");			//	グラフィックハンドルに操作説明のイメージをセット
+	m_iceSoundHandle = LoadSoundMem("data/sound/throwIce.mp3");		//	サウンドハンドルにアイス発射時の効果音をセット
+	m_hitSoundHandle = LoadSoundMem("data/sound/hitIce.mp3");		//	サウンドハンドルにヒット時の効果音をセット
+	m_missSoundHandle = LoadSoundMem("data/sound/missIce.mp3");		//	サウンドハンドルにミス時の効果音をセット
 	int scoreHandle = LoadGraph("data/model/score_ui/score(1).png");
 	m_player = new Player;			//	プレイヤークラスのインスタンスを生成
 	m_camera = new Camera;			//	カメラクラスのインスタンスを生成
 	m_mark = new Mark;				//	マーククラスのインスタンスを生成
+	
+	int lowCount = 0;
+	int highCount = 0;
 	for (int i = 0; i < (enemyNum + 1); i++)
 	{
 		m_target[i] = new Target;
 		m_target[i]->SetInterval(TARGET_SHOT_INTERVAL);
+		
+		// ランダムに設定
+		int count = GetNowCount() / 1000;
+		SRand(count);
+		float rand = (float)GetRand(30000) / 80000.0f + (float)(i + 1) / 1000000000.0f;
+		m_target[i]->SetAccel(rand);
+		if (count % 2 == 0)
+		{
+			SRand(GetNowCount() / 1000.0f);
+			rand = (float)GetRand(3000) / 500000.0f;
+			m_target[i]->SetAccel(rand);
+		}
+		if (rand <= 0.02f)
+		{
+			lowCount++;
+		}
+		if (lowCount >= 2)
+		{
+			SRand(GetNowCount() / 1000.0f);
+			rand = (float)GetRand(30000) / 80000.0f + (float)(i + 1) / 1000000000.0f;
+			m_target[i]->SetAccel(rand);
+			lowCount = 0;
+		}
+		if (rand >= 0.2f)
+		{
+			highCount++;
+		}
+		if (highCount >= 3)
+		{
+			SRand(GetNowCount() / 1000.0f);
+			rand = (float)GetRand(3000) / 500000.0f;
+			m_target[i]->SetAccel(rand);
+			highCount = 0;
+		}
+
+		m_target[i]->SetThrowSound(m_iceSoundHandle);
+		m_target[i]->SetHitSound(m_hitSoundHandle);
+		m_target[i]->SetMissSound(m_missSoundHandle);
+		// m_target[i]->SetAccelVec()
 	}
+
 
 	for (int i = 0; i < 2; ++i)
 	{
@@ -244,7 +319,7 @@ void GameSceneHard::Load()
 	// UIクラスのprivateメンバ変数に画像ハンドルをロード
 	m_score_ui[0]->Load();
 
-	m_effect = new PlayEffect("data/effects/FeatherBomb.efk");
+	m_effect = new PlayEffect("data/effects/FeatherBomb.efk", 5.0f);
 
 }
 

@@ -41,6 +41,8 @@ Player::Player()
 
 	// posはVector型なので、VGetで原点にセット
 	pos = VGet(0, 10, -100);
+	// ３Dモデルのポジション設定
+	MV1SetPosition(modelHandle, pos);
 	// 移動する力を（すべての座標）ゼロにする
 	velocity = VGet(0, 0, 0);
 	// 

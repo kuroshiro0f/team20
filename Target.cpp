@@ -122,8 +122,8 @@ void Target::Draw()
 	{
 		int timebuffer = GetNowCount() / 1000;
 		
-		DrawFormatStringToHandle(m_font_X, m_font_Y, GetColor(255, 255, 255),m_FontHandle, "%d"
-			, (m_shotInterval + 1) - (timebuffer - m_setTime));
+		//DrawFormatStringToHandle(m_font_X, m_font_Y, GetColor(255, 255, 255),m_FontHandle, "%d"
+			//, (m_shotInterval + 1) - (timebuffer - m_setTime));
 	}
 
 	// デバッグあたり判定.

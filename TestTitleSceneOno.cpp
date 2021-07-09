@@ -35,6 +35,7 @@ TestTitleScene::~TestTitleScene()
 {
 	StopSoundMem(m_soundHandle);
 	DeleteSoundMem(m_soundHandle);
+	DeleteSoundMem(m_click_sound_handle);		//	ENTERで進むときのサウンドメモリを解放
 	DeleteGraph(m_backGraphHandle);
 	DeleteGraph(m_logoGraphHandle);
 	DeleteGraph(m_guidanceGraphHandle);
@@ -64,6 +65,7 @@ SceneBase* TestTitleScene::Update()
 		{
 			// ※キー入力重複対策のフラグ
 			m_checkKeyFlag = true;
+			PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);
 
 			m_state = TITLE_TRANS_STATE::SECOND_CHOICE;
 		}
@@ -114,6 +116,7 @@ SceneBase* TestTitleScene::Update()
 		// ENTERで選択した難易度のシーンへ
 		if (CheckHitKey(KEY_INPUT_RETURN) && !m_checkKeyFlag)
 		{
+			PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);
 
 			if (m_cursolNum == 0)
 			{
@@ -241,7 +244,8 @@ void TestTitleScene::Load()
 	m_backGraphHandle = LoadGraph("data/img/Title_back.png");			//	グラフィックハンドルにタイトル画面のイメージをセット
 	m_logoGraphHandle = LoadGraph("data/img/Title_logo.png");			//	グラフィックハンドルにタイトル画面のイメージをセット
 	m_guidanceGraphHandle = LoadGraph("data/img/Title_guidance.png");	//	グラフィックハンドルにタイトル画面のイメージをセット
-	m_soundHandle = LoadSoundMem("data/sound/titleBgm.ogg");			//	サウンドハンドルにタイトル画面のBGMをセット
+	m_soundHandle = LoadSoundMem("data/sound/titleBgm.ogg");
+	m_click_sound_handle = LoadSoundMem("data/sound/EnterToSound.wav");	//	ENTERで進む際のサウンドをロード
 }
 
 /// <summary>

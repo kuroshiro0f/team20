@@ -8,6 +8,13 @@
 class GameSceneNormal :public SceneBase
 {
 public:
+
+	enum class GAME_SCENE_STATE
+	{
+		COUNTDOWN,
+		GAME
+	};
+
 	GameSceneNormal();				//	コンストラクタ
 	~GameSceneNormal();			//	デストラクタ
 
@@ -27,6 +34,7 @@ private:
 	class UI* m_score_ui[10];		//  UIクラスへのポインタメンバ変数
 	class UI* m_hit_ui[10];			//	ヒット判定UIクラスへのポインタメンバ変数
 	class PlayEffect* m_effect;     //  エフェクトプレーヤー
+	GAME_SCENE_STATE m_state;
 	int m_targetCount;				//	アイスの飛ばした個数
 	int m_startTime;				//	ゲームの開始時間
 	int m_girl_Y;					//	
@@ -35,6 +43,9 @@ private:
 	int m_finishGraphHandle;		//	ゲーム終了文字のグラフィックハンドル
 	int m_soundHandle;				//	ゲーム画面・サウンドハンドル
 	int m_finishSoundHandle;		//	ゲーム画面・終了の効果音用サウンドハンドル
+	int m_iceSoundHandle;			//	アイスの発射音用サウンドハンドル
+	int m_hitSoundHandle;			//	アイスと皿の衝突音用サウンドハンドル
+	int m_missSoundHandle;			//	アイスと皿が衝突失敗した時の交換用サウンドハンドル
 	int m_manualGraphHandle;		//	操作説明のグラフィックハンドル
 	int m_girlGraphHandle;
 	int m_ladyGraphHandle;
