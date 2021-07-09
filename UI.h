@@ -13,7 +13,7 @@ public:
 	void UI::Load();
 	// 更新
 	// 引数にエネミーからscoreとターゲットカウントを持ってくる
-	void UI::ScoreUpdate(UI* _scoreUi, bool _hitOrMiss);
+	void UI::ScoreUpdate(bool _hitOrMiss);
 	// 描画
 	void UI::Draw();
 	// getter

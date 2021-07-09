@@ -13,7 +13,7 @@ PlayEffect::PlayEffect(const char* sourceEffectHandle)
 	,m_playingEffect(-1)
 {
 	// モデルのロード
-	m_effectHandle = LoadEffekseerEffect(sourceEffectHandle);
+	m_effectHandle = LoadEffekseerEffect(sourceEffectHandle,1.5f);
 	if (m_effectHandle == -1)
 	{
 		printfDx("エフェクト読み込み失敗");

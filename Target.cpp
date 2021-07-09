@@ -2,6 +2,8 @@
 #include "ObstructBase.h"
 #include "TestSceneKoga.h"
 #include "Hitchecker.h"
+#include "Effect.h"
+#include "UI.h"
 
 // 静的定数.
 const int Target::m_target_X = 400;
@@ -26,6 +28,7 @@ Target::Target()
 	, m_plusX(0)
 	, m_setTime(0) 
 	, m_iceState(NO_SHOT)
+	, m_hitFlag(false)
 {
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/target/icecream/SVH-icecream/icecream.pmx");
@@ -123,13 +126,17 @@ void Target::Draw()
 //-----------------------------------------------------------------------------
 // @brief  リアクション.
 //-----------------------------------------------------------------------------
-void Target::Reaction(bool _hitFlag)
+void Target::Reaction(UI* _ui, bool _hitFlag)
 {
 	switch (_hitFlag)
 	{
 	case true:
 		m_plusX = 20 + m_targetCount * 10;
 		pos = VGet(m_plusX, 10, 20);
+		m_hitFlag = true;
+
+		ScoreUpdateUI(*_ui, _hitFlag);
+
 		// ３Dモデルのポジション設定
 		MV1SetPosition(modelHandle, pos);
 		m_iceState = END_SHOT;
@@ -138,16 +145,20 @@ void Target::Reaction(bool _hitFlag)
 		if (pos.x < -500 || pos.x > 500 && m_iceState == NOW_SHOT)
 		{
 			pos = VGet(200, 100, 200);
+
+			ScoreUpdateUI(*_ui, _hitFlag);
+
 			// ３Dモデルのポジション設定
 			MV1SetPosition(modelHandle, pos);
 			m_iceState = END_SHOT;
 		}
 		break;
 	}
+}
 
-
-
-	
+void Target::ScoreUpdateUI(UI& _ui,bool _hitFlag)
+{
+	_ui.ScoreUpdate(_hitFlag);
 }
 
 //-----------------------------------------------------------------------------

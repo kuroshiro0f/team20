@@ -46,15 +46,16 @@ void UI::Load()
 
 // 更新
 // 引数にエネミーからscoreとtargetCountを持ってくる
-void UI::ScoreUpdate(UI* _scoreUi, bool _hitOrMiss)
+void UI::ScoreUpdate(bool _hitOrMiss)
 {
-	// 当たり判定を読んで×か〇かの判定？
-	// 当たっていれば
+	m_handle = -1;
 	if (m_handle == -1)
 	{
+		// 当たり判定を読んで×か〇かの判定？
+			// 当たっていれば
 		if (_hitOrMiss)
 		{
-			// 何個目かをエネミーから呼ぶ？
+			// 描画用ハンドルにhitのハンドルを格納
 			m_handle = m_hit_graphHandle;
 			// スコアを一つ加算する
 			m_score++;
@@ -62,7 +63,7 @@ void UI::ScoreUpdate(UI* _scoreUi, bool _hitOrMiss)
 		// 当たっていなければ
 		else
 		{
-			// 何個目かをエネミーから呼ぶ？	
+			// 描画用ハンドルにmissのハンドルを格納
 			m_handle = m_miss_graphHandle;
 		}
 	}

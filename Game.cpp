@@ -96,7 +96,7 @@ SceneBase* Game::Update()
 	//{
 	m_target[m_targetCount]->Update();
 	m_target[m_targetCount]->SetTargetCount(m_targetCount);
-	m_target[m_targetCount]->Reaction(HitChecker::Check(*m_player, *m_target[m_targetCount]));
+	//m_target[m_targetCount]->Reaction(HitChecker::Check(*m_player, *m_target[m_targetCount]));
 
 	//}
 	m_player->Update();
