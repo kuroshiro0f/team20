@@ -9,8 +9,13 @@ const int RESULT_NUM = 3;
 const int NICE_P = 5;
 const int PF_P = 10;
 
-Result::Result()
-	:m_score(6)
+// 最大透過量
+const int defaultTrans = 122;
+// 透過量変化用ベクトル
+const int transModeration = -1;
+
+Result::Result(const int &_score)
+	:m_score(_score)
 {
 	if (m_score < NICE_P)
 	{
@@ -48,6 +53,12 @@ Result::Result()
 	//m_bgmSoundHandle = LoadSoundMem("");									//	サウンドハンドルにリザルト画面のBGMをセット
 	m_scoreSoundHandle = LoadSoundMem("data/sound/score.mp3");				//	サウンドハンドルにリザルト画面の効果音をセット
 	m_numSoundHandle = LoadSoundMem("data/sound/num.mp3");					//	サウンドハンドルにリザルト画面の効果音をセット
+
+	// 透過量変数を122に設定
+	transParent = defaultTrans;
+	// 毎透過量変数を１に設定
+	permeationAmount = 1;
+
 	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
 		m_checkKeyFlag = TRUE;
@@ -91,6 +102,26 @@ SceneBase* Result::Update()
 	{
 		m_checkKeyFlag = FALSE;
 	}
+
+	// 透過量が122より大きくなったら
+	if (transParent >= defaultTrans)
+	{
+		// 透過量を121に設定
+		transParent = 121;
+		// 毎透過量を-1にする
+		permeationAmount *= transModeration;
+	}
+	// 透過量が0より小さければ
+	else if (0 >= transParent)
+	{
+		// 透過量を１に設定
+		transParent = 1;
+		// 毎透過量を1にする
+		permeationAmount *= transModeration;
+	}
+	// 毎透過量を透過量に加算する
+	transParent += permeationAmount;
+
 	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
 	{
 		return new Title;
@@ -101,7 +132,12 @@ SceneBase* Result::Update()
 void Result::Draw()
 {
 	DrawGraph(LOGO_X, LOGO_Y, m_logoGraphHandle, TRUE);					//	リザルト画面のロゴを表示
+
+	// 透過して描画
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, transParent);
 	DrawGraph(GUIDANCE_X, GUIDANCE_Y, m_guidanceGraphHandle, TRUE);		//	リザルト画面のロゴを表示
+	// 透過を元に戻す
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	if (m_checkResultFlag >= 1)
 	{
 		DrawGraph(0, 0, m_scoreGraphHandle, TRUE);						//	リザルト画面のロゴを表示

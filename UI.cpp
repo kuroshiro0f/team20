@@ -12,6 +12,7 @@ int UI::m_help_graphHandle;
 int UI::m_score_graphHandle;
 int UI::m_hit_graphHandle;
 int UI::m_miss_graphHandle;
+int UI::m_score;
 
 // ScoreUIコンストラクタ
 UI::UI(const int& _x, const int& _y, const int& _graph_handle)
@@ -21,6 +22,8 @@ UI::UI(const int& _x, const int& _y, const int& _graph_handle)
 	m_posY = (_y * score_graph_size) + 100;
 	// 使う画像を格納する
 	m_handle = _graph_handle;
+	// scoreを０にする
+	m_score = 0;
 }
 
 // ScoreUIデストラクタ
@@ -47,23 +50,27 @@ void UI::ScoreUpdate(UI* _scoreUi, bool _hitOrMiss)
 {
 	// 当たり判定を読んで×か〇かの判定？
 	// 当たっていれば
-	if (_hitOrMiss)
+	if (m_handle == -1)
 	{
-		// 何個目かをエネミーから呼ぶ？
-		m_handle = m_hit_graphHandle;
+		if (_hitOrMiss)
+		{
+			// 何個目かをエネミーから呼ぶ？
+			m_handle = m_hit_graphHandle;
+			// スコアを一つ加算する
+			m_score++;
+		}
+		// 当たっていなければ
+		else
+		{
+			// 何個目かをエネミーから呼ぶ？	
+			m_handle = m_miss_graphHandle;
+		}
 	}
-	// 当たっていなければ
-	else
-	{
-		// 何個目かをエネミーから呼ぶ？	
-		m_handle = m_miss_graphHandle;
-	}
-
 }
 
 // 描画(仮引数の値で呼び出す画像を変える)
 void UI::Draw()
 {
 	//DrawGraph(m_posX, m_posY, m_handle, TRUE);
-	DrawRotaGraph(m_posX, m_posY, score_shrink, 0, m_handle, TRUE, FALSE);
+ 	DrawRotaGraph(m_posX, m_posY, score_shrink, 0, m_handle, TRUE, FALSE);
 }

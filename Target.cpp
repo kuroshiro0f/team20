@@ -8,7 +8,7 @@ const int Target::m_target_X = 400;
 const int Target::m_target_Y = 10;
 const int Target::m_target_Z = 0;
 const float Target::m_target_accel = 0.1f;
-
+//const float Target::m_target_accel = 0;
 //-----------------------------------------------------------------------------
 // @brief  コンストラクタ.
 //-----------------------------------------------------------------------------
@@ -17,6 +17,7 @@ Target::Target()
 	, hitRadius(5.0f)
 	, timenow(0)
 	, m_isShot(false)
+	,m_endShot(false)
 {
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/target/icecream/SVH-icecream/icecream.pmx");
@@ -52,6 +53,8 @@ void Target::Update()
 		if (pos.x < -500 || pos.x > 500)
 		{
 			accelVec = VGet(0, 0, 0);
+			///////
+			m_endShot = true;
 		}
 	}
 	

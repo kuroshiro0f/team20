@@ -35,6 +35,10 @@ private:
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_finishFlag;				//	ゲーム終了判定フラグ
 	bool m_iceThrowFlag;			//	アイス射出フラグ
+
+	//// 確認用変数
+	int m_hitCount;
+	bool m_hitFlag;
 };
 
 #endif // _GAME_H_

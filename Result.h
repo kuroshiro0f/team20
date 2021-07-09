@@ -2,6 +2,7 @@
 #define _RESULT_H_
 
 #include "SceneBase.h"
+#include "UI.h"
 //#include <iostream>
 //#include <string>
 
@@ -12,7 +13,7 @@
 class Result : public SceneBase
 {
 public:
-	Result();			//	コンストラクタ
+	Result(const int& _score);			//	コンストラクタ
 	~Result();			//　デストラクタ
 
 	SceneBase* Update()override;	//	更新
@@ -29,6 +30,10 @@ private:
 	int m_scoreGraphHandle;				//	スコアのグラフィックハンドル
 	int m_numGraphHandle[11];			//
 	int m_evaluationGraphHandle[3];		//	評価のグラフィックハンドル
+	// 毎透過量
+	int permeationAmount;
+	// 透過量
+	int transParent;
 	int m_bgmSoundHandle;				//	BGMのサウンドハンドル
 	int m_scoreSoundHandle;				//	スコアのサウンドハンドル
 	int m_numSoundHandle;				//	数表示のサウンドハンドル

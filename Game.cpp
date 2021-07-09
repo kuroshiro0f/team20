@@ -10,9 +10,7 @@
 
 #include "DxLib.h"
 
-//// 確認用変数
-int hitCount = NULL;
-bool hitFrag = false;
+#include "TestScene_fujihara.h"
 
 static int enemyNum = 10;
 
@@ -23,6 +21,9 @@ Game::Game()
 	, m_targetCount(0)
 	, m_startTime(0)
 	, m_iceThrowFlag(false)
+	//　確認用
+	,m_hitCount(0)
+	,m_hitFlag(false)
 {
 	// 次のシーンへ移行するかどうか
 	m_finishFlag = FALSE;
@@ -81,7 +82,7 @@ SceneBase* Game::Update()
 	}
 	m_player->Update();
 
-	m_camera->Update(*m_player);
+	//m_camera->Update(*m_player);
 	for (int i = 0; i < m_targetCount; i++)
 	{
 		HitChecker::Check(*m_player, *m_target[i]);
@@ -92,8 +93,10 @@ SceneBase* Game::Update()
 	}
 	if (m_finishFlag == TRUE)
 	{
+		// scoreUIのスコアをResultのscore変数にセット
+		
 		WaitTimer(3000);
-		return new Result;				//	リザルトシーンに切り替える
+		return new Result(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
 	}
 	return this;						//	ゲームシーンを表示し続ける
 }
@@ -115,7 +118,7 @@ void Game::Draw()
 	{
 		m_score_ui[i]->Draw();
 	}
-	for (int i = 0; i < hitCount; ++i)
+	for (int i = 0; i < m_hitCount; ++i)
 	{
 		m_hit_ui[i]->Draw();
 	}
@@ -170,20 +173,20 @@ void Game::DebugKey()
 	// 確認用
 	if (CheckHitKey(KEY_INPUT_A))
 	{
-		if (hitCount < enemyNum)
+		if (m_hitCount < enemyNum)
 		{
-			hitFrag = true;
-			m_hit_ui[hitCount]->ScoreUpdate(m_hit_ui[hitCount], hitFrag);
-			hitCount++;
+			m_hitFlag = true;
+			//m_hit_ui[m_hitCount]->ScoreUpdate(m_hit_ui[m_hitCount], m_hitFlag);
+			m_hitCount++;
 		}
 	}
 	if (CheckHitKey(KEY_INPUT_B))
 	{
-		if (hitCount < enemyNum)
+		if (m_hitCount < enemyNum)
 		{
-			hitFrag = false;
-			m_hit_ui[hitCount]->ScoreUpdate(m_hit_ui[hitCount], hitFrag);
-			hitCount++;
+			m_hitFlag = false;
+			//m_hit_ui[m_hitCount]->ScoreUpdate(m_hit_ui[m_hitCount], m_hitFlag);
+			m_hitCount++;
 		}
 	}
 	if (m_iceThrowFlag)
