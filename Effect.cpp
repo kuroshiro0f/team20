@@ -58,7 +58,7 @@ void PlayEffect::Delete()
 void PlayEffect::StopEffect()
 {
 	StopEffekseer3DEffect(m_playingEffect);
-	m_playingEffect = -1;
+	m_playingEffect = IsEffekseer3DEffectPlaying(m_playingEffect);
 }
 
 /// <summary>
@@ -76,7 +76,7 @@ const int PlayEffect::GetNowPlaying()
 /// <param name="_size"></param>
 void PlayEffect::SetPlayingEffectPos(const VECTOR& _playPos)
 {
-	SetPosPlayingEffekseer3DEffect(m_effectHandle, _playPos.x, _playPos.y, _playPos.z);
+	SetPosPlayingEffekseer3DEffect(m_playingEffect, _playPos.x, _playPos.y, _playPos.z);
 }
 
 /// <summary>
@@ -85,7 +85,7 @@ void PlayEffect::SetPlayingEffectPos(const VECTOR& _playPos)
 /// <param name="_dirVec"></param>
 void PlayEffect::SetPlayingEffectRotation(const VECTOR& _dirVec)
 {
-	SetRotationPlayingEffekseer3DEffect(m_effectHandle, _dirVec.x, _dirVec.y, _dirVec.z);
+	SetRotationPlayingEffekseer3DEffect(m_playingEffect, _dirVec.x, _dirVec.y, _dirVec.z);
 }
 
 // Effekseer3D‚Ì•`‰æ

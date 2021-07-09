@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 #include "Player.h"
 #include "ObstructBase.h"
+#include "Effect.h"
 
 // 静的定数.
 const float Player::ACCEL				= 0.3f;		// 通常の加速.
@@ -25,12 +26,18 @@ const float Player::COLIDE_DECEL_FAC	= 0.4f;			// 障害物にぶつかったと
 Player::Player()
 	: modelHandle(-1)
 	 , hitRadius(5.0f)
+	,m_playerOrbitEfk(nullptr)
 {
 	// サウンドの読み込み
 	m_sHandle = LoadSoundMem("data/sound/sara_shrow.wav");
 
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/sara/sara.pmx");
+
+	// エフェクト読み込み
+	m_playerOrbitEfk = new PlayEffect("data/effects/PlayerLine.efk");
+	m_efkDir = VGet(0.0f, DX_PI_F, 0.0f);
+	m_playerOrbitEfk->SetPlayingEffectRotation(m_efkDir);
 
 	// posはVector型なので、VGetで原点にセット
 	pos = VGet(0, 10, -100);
@@ -51,6 +58,9 @@ Player::~Player()
 	MV1DeleteModel(modelHandle);
 	// サウンドのアンロード
 	DeleteSoundMem(m_sHandle);
+	// エフェクトのアンロード
+	m_playerOrbitEfk->Delete();
+	delete m_playerOrbitEfk;
 }
 
 //-----------------------------------------------------------------------------
@@ -147,8 +157,26 @@ void Player::Draw()
 	// ３Ｄモデルの描画
 	MV1DrawModel(modelHandle);
 
+	if (!KeyPush)
+	{
+		m_playerOrbitEfk->StopEffect();
+	}
+	// プレイヤーの軌道エフェクト
+	if (KeyPush)
+	{
+		if (m_playerOrbitEfk->GetNowPlaying() != 0)
+		{
+			m_playerOrbitEfk->PlayEffekseer(pos);
+			m_playerOrbitEfk->SetPlayingEffectRotation(m_efkDir);
+		}
+
+		// エフェクト再生中はプレイヤーの座標を追尾
+		m_playerOrbitEfk->SetPlayingEffectPos(pos);	
+	}
+
+
 	// デバッグあたり判定.
-	DrawSphere3D(pos, hitRadius, 5, 0x00ffff, 0x00ffff, false);
+	// DrawSphere3D(pos, hitRadius, 5, 0x00ffff, 0x00ffff, false);
 }
 
 //-----------------------------------------------------------------------------

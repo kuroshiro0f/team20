@@ -40,11 +40,13 @@ public:
 private:
 	int		modelHandle;	// モデルハンドル.
 	VECTOR	pos;			// ポジション.
-
 	VECTOR	velocity;		// 移動力.
-
 	VECTOR	dir;			// 回転方向.
 	float	hitRadius;		// あたり判定の半径.
+
+	// 発射エフェクト
+	class PlayEffect* m_playerOrbitEfk;
+	VECTOR m_efkDir;
 
 	// player用サウンド変数
 	static int m_sHandle;
