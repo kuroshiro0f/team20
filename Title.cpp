@@ -71,7 +71,7 @@ SceneBase* Title::Update()
 	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
 	{
 		PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);
-		return new Game;
+		return new TestSceneUeyama;
 	}
 	return this;
 }
