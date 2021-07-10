@@ -21,6 +21,9 @@ static int GONG_VOLUME_PAL = 30;
 
 // ターゲットが飛んでくる間隔 (秒単位)
 const int TARGET_SHOT_INTERVAL = 3;
+const int SCREEN_SIZE_W = 1920;
+const int SCREEN_SIZE_H = 1080;
+
 
 GameSceneEasy::GameSceneEasy()
 	:m_player(nullptr)
@@ -181,8 +184,6 @@ void GameSceneEasy::Draw()
 {
 	// 背景
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);
-	// 操作説明系
-	DrawGraph(0, 0, m_manualGraphHandle, TRUE);							//	操作説明を表示
 	DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
 	DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);//	タイトル画面の背景を表示
 	// 目印となる机
@@ -217,12 +218,21 @@ void GameSceneEasy::Draw()
 		m_target[m_targetCount]->SetHitIce(false);
 	}
 
-	// カウントダウンの描画
 	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
 	{
-		int Count = (COUNTDOWN)-(GetNowCount() / 1000 - m_startTime);
-		DrawExtendFormatString(960, 540, 10.0, 10.0, GetColor(255, 0, 0), "%d", Count);
+		// 透過して描画
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+		// 透過を元に戻す
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
+		DrawGraph(0, 0, m_manualGraphHandle, TRUE);							//	操作説明を表示
+		// カウントダウンの描画
+		if (m_state == GAME_SCENE_STATE::COUNTDOWN)
+		{
+			int Count = (COUNTDOWN)-(GetNowCount() / 1000 - m_startTime);
+			DrawExtendFormatString(960, 540, 10.0, 10.0, GetColor(255, 0, 0), "%d", Count);
+		}
 
 	/*m_obstructManager->Draw();*/
 	/*DrawString(0, 0, "ゲーム画面です", GetColor(255, 255, 255));*/

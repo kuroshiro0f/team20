@@ -21,6 +21,8 @@ static int GONG_VOLUME_PAL = 30;
 
 // ƒ^[ƒQƒbƒg‚ª”ò‚ñ‚Å‚­‚éŠÔŠu (•b’PˆÊ)
 const int TARGET_SHOT_INTERVAL = 0;
+const int SCREEN_SIZE_W = 1920;
+const int SCREEN_SIZE_H = 1080;
 
 GameSceneHard::GameSceneHard()
 	:m_player(nullptr)
@@ -181,8 +183,6 @@ void GameSceneHard::Draw()
 {
 	// ”wŒi
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);
-	// ‘€ìà–¾Œn
-	DrawGraph(0, 0, m_manualGraphHandle, TRUE);							//	‘€ìà–¾‚ð•\Ž¦
 	DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
 	DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);//	ƒ^ƒCƒgƒ‹‰æ–Ê‚Ì”wŒi‚ð•\Ž¦
 	// –Úˆó‚Æ‚È‚éŠ÷
@@ -217,6 +217,15 @@ void GameSceneHard::Draw()
 		m_target[m_targetCount]->SetHitIce(false);
 	}
 
+	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
+	{
+		// “§‰ß‚µ‚Ä•`‰æ
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+		// “§‰ß‚ðŒ³‚É–ß‚·
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+	DrawGraph(0, 0, m_manualGraphHandle, TRUE);						
 	// ƒJƒEƒ“ƒgƒ_ƒEƒ“‚Ì•`‰æ
 	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
 	{

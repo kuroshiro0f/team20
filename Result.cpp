@@ -8,6 +8,7 @@ const int GUIDANCE_Y = 0;
 const int RESULT_NUM = 3;
 const int NICE_P = 5;
 const int PF_P = 10;
+const int VOLUME_PAL_SUP = 90;
 
 // ç≈ëÂìßâﬂó 
 const int defaultTrans = 255;
@@ -128,6 +129,7 @@ SceneBase* Result::Update()
 
 	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
 	{
+		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_click_sound_handle);
 		PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);		//	âπÇ™çƒê∂ÇµèIÇÌÇÈÇ‹Ç≈ë“ã@
 		return new TestTitleScene;
 	}
@@ -164,15 +166,15 @@ void Result::Sound()
 	{
 	case 1:
 		PlaySoundMem(m_scoreSoundHandle, DX_PLAYTYPE_BACK, TRUE);
-		ChangeVolumeSoundMem(m_volumePal, m_scoreSoundHandle);
+		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_scoreSoundHandle);
 		break;
 	case 2:
 		PlaySoundMem(m_numSoundHandle, DX_PLAYTYPE_BACK, TRUE);
-		ChangeVolumeSoundMem(m_volumePal, m_numSoundHandle);
+		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_numSoundHandle);
 		break;
 	case 3:
 		PlaySoundMem(m_evaluationSoundHandle[m_evaluation], DX_PLAYTYPE_BACK, TRUE);
-		ChangeVolumeSoundMem(m_volumePal, m_evaluationSoundHandle[m_evaluation]);
+		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_evaluationSoundHandle[m_evaluation]);
 		break;
 	}
 	/*PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_LOOP, TRUE);

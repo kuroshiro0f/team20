@@ -16,6 +16,8 @@ const int ALL_DIFFICULT = 3;
 const int SCREEN_SIZE_W = 1920;
 const int SCREEN_SIZE_H = 1080;
 
+const int VOLUME_PAL_SUP = 130;
+
 
 TestTitleScene::TestTitleScene()
 	:m_state(TITLE_TRANS_STATE::FIRST_ENTER)
@@ -65,6 +67,7 @@ SceneBase* TestTitleScene::Update()
 		{
 			// ※キー入力重複対策のフラグ
 			m_checkKeyFlag = true;
+			ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_click_sound_handle);
 			PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);
 
 			m_state = TITLE_TRANS_STATE::SECOND_CHOICE;
@@ -116,6 +119,7 @@ SceneBase* TestTitleScene::Update()
 		// ENTERで選択した難易度のシーンへ
 		if (CheckHitKey(KEY_INPUT_RETURN) && !m_checkKeyFlag)
 		{
+			ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_click_sound_handle);
 			PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);
 
 			if (m_cursolNum == 0)
