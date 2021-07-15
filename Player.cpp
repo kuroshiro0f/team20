@@ -25,7 +25,7 @@ const float Player::COLIDE_DECEL_FAC	= 0.4f;			// 障害物にぶつかったと
 //-----------------------------------------------------------------------------
 Player::Player()
 	: modelHandle(-1)
-	 , hitRadius(5.0f)
+	 , hitRadius(7.5f)
 	,m_playerOrbitEfk(nullptr)
 {
 	// サウンドの読み込み

@@ -165,6 +165,10 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameScene_easy.cpp" />
     <ClCompile Include="GameScene_hard.cpp" />
+    <ClCompile Include="GameScene_Lunatic.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GameScene_normal.cpp" />
     <ClCompile Include="HitChecker.cpp" />
     <ClCompile Include="main.cpp" />
@@ -198,6 +202,10 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameScene_easy.h" />
     <ClInclude Include="GameScene_hard.h" />
+    <ClInclude Include="GameScene_Lunatic.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="GameScene_normal.h" />
     <ClInclude Include="Hitchecker.h" />
     <ClInclude Include="Mark.h" />
