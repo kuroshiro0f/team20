@@ -4,6 +4,7 @@
 #include "Hitchecker.h"
 #include "Effect.h"
 #include "UI.h"
+#include <cmath>
 
 // 静的定数.
 const int Target::m_target_X = 400;
@@ -16,6 +17,7 @@ const int Target::m_font_Y = 160;
 const int Target::m_font_size = 50;
 const int Target::m_font_thick = -1;
 
+static const double pi = 3.141592653589793;
 
 
 //-----------------------------------------------------------------------------
@@ -23,7 +25,7 @@ const int Target::m_font_thick = -1;
 //-----------------------------------------------------------------------------
 Target::Target()
 	: modelHandle(-1)
-	, hitRadius(5.0f)
+	, hitRadius(7.5f)
 	, timenow(0)
 	, m_targetCount(0)
 	, m_plusX(0)
@@ -33,6 +35,7 @@ Target::Target()
 	, m_hitFlag(false)
 	, m_throwIceSoundHandle(-1)
 	, m_hitIceSoundHandle(-1)
+	, m_iceType(0)
 {
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/target/icecream/SVH-icecream/icecream.pmx");
@@ -71,7 +74,6 @@ void Target::Update()
 	if (m_iceState == NOW_SHOT)
 	{
 		accelVec = VScale(dir, m_target_accel);
-		
 	}
 	
 
@@ -84,6 +86,21 @@ void Target::Update()
 
 	// ポジションを更新.
 	pos = VAdd(pos, velocity);
+
+	switch (m_iceType)
+	{
+	case 0:
+		break;
+	case 1:
+		pos.z = cos(pos.x / 20.0f) * (pos.x / 5);
+		break;
+	case 2:
+		pos.y = sin(pos.x / 20.0f) * (pos.x / 5);
+		pos.z = cos(pos.x / 20.0f) * (pos.x / 5);
+		break;
+	}
+	//pos.y = sin(pos.x / 20.0f) * (pos.x / 5);
+	//pos.z = cos(pos.x / 20.0f) * (pos.x / 5);
 
 	// 力をかけ終わったベロシティの方向にディレクションを調整.
 	if (VSize(velocity) != 0)
@@ -122,8 +139,8 @@ void Target::Draw()
 	{
 		int timebuffer = GetNowCount() / 1000;
 		
-		//DrawFormatStringToHandle(m_font_X, m_font_Y, GetColor(255, 255, 255),m_FontHandle, "%d"
-			//, (m_shotInterval + 1) - (timebuffer - m_setTime));
+		DrawCircleAA(m_font_X, m_font_Y,((m_shotInterval + 1) - (timebuffer - m_setTime))*30
+			,32, GetColor(255, 255, 255),FALSE);
 	}
 
 	// デバッグあたり判定.

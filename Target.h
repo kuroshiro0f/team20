@@ -51,6 +51,8 @@ public:
 	void SetThrowSound(int _sound) { m_throwIceSoundHandle = _sound; }
 	void SetHitSound(int _sound) { m_hitIceSoundHandle = _sound; }
 	void SetMissSound(int _sound) { m_missIceSoundHandle = _sound; }
+	void SetIceType(int _iceType) { m_iceType = _iceType; }
+	int GetIceType() { return m_iceType; }
 
 	void SetHitIce(bool _hitFlag) { m_hitFlag = _hitFlag; }
 	bool GetHitIce() { return m_hitFlag; }
@@ -82,6 +84,7 @@ private:
 	int		m_plusX;
 	int		m_setTime;
 	int     m_shotInterval;     // エネミーを飛ばす間隔
+	int		m_iceType;
 
 	float m_target_accel;
 
