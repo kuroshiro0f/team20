@@ -7,22 +7,28 @@
 class TestSceneUeyama : public SceneBase
 {
 public:
-	TestSceneUeyama();
-	~TestSceneUeyama();
-
 	enum class GAME_SCENE_STATE
 	{
 		COUNTDOWN,
 		GAME
 	};
 
-	SceneBase* Update()override;	//	更新
+	TestSceneUeyama();
+	~TestSceneUeyama();
+
+	SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
 	void DebugKey();
 
 	int GetTargetCount() { return m_targetCount; }
+
+	////	デルタタイムのゲッター
+	//float GetDeltaTime() { return m_deltaTime; }
+	////	デルタタイムのセッター
+	//void SetDeltaTime(float _deltaTime) { m_deltaTime = _deltaTime; }
+
 
 private:
 	class Player* m_player;			//	プレイヤークラスへのポインタメンバ変数
@@ -41,14 +47,22 @@ private:
 	int m_finishGraphHandle;		//	ゲーム終了文字のグラフィックハンドル
 	int m_soundHandle;				//	ゲーム画面・サウンドハンドル
 	int m_finishSoundHandle;		//	ゲーム画面・終了の効果音用サウンドハンドル
+	int m_iceSoundHandle;			//	アイスの発射音用サウンドハンドル
+	int m_hitSoundHandle;			//	アイスと皿の衝突音用サウンドハンドル
+	int m_missSoundHandle;			//	アイスと皿が衝突失敗した時の交換用サウンドハンドル
+	int m_doorSoundHandle;			//	入店音のサウンドハンドル
 	int m_manualGraphHandle;		//	操作説明のグラフィックハンドル
 	int m_girlGraphHandle;
 	int m_ladyGraphHandle;
+	//float m_deltaTime;				//	デルタタイム
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_finishFlag;				//	ゲーム終了判定フラグ
 	bool m_iceThrowFlag;			//	アイス射出フラグ
 	bool m_iceHitFlagBuffer;
 	bool m_girlUpFlag;
+	bool m_fadeInFinishFlag;		//	フェードインの終了判定フラグ
+	bool m_fadeOutFlag;				//	フェードアウト開始用のフラグ
+	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
 
 	//// 確認用変数
 	int m_hitCount;

@@ -9,7 +9,7 @@ public:
 	SceneMgr();			//	コンストラクタ
 	~SceneMgr();		//	デストラクタ
 
-	void Update();		//	更新
+	void Update(float _deltaTime);		//	更新
 	void Draw();		//	描画
 	void Sound();		//　音楽
 

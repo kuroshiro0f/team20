@@ -182,6 +182,7 @@
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMgr.cpp" />
     <ClCompile Include="Target.cpp" />
+    <ClCompile Include="TestResultSceneUeyama.cpp" />
     <ClCompile Include="TestSceneKoga.cpp" />
     <ClCompile Include="TestSceneOno.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -193,6 +194,7 @@
     </ClCompile>
     <ClCompile Include="TestScene_fujihara.cpp" />
     <ClCompile Include="TestTitleSceneOno.cpp" />
+    <ClCompile Include="TestTitleSceneUeyama.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="UI.cpp" />
   </ItemGroup>
@@ -218,11 +220,13 @@
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneMgr.h" />
     <ClInclude Include="Target.h" />
+    <ClInclude Include="TestResultSceneUeyama.h" />
     <ClInclude Include="TestSceneKoga.h" />
     <ClInclude Include="TestSceneOno.h" />
     <ClInclude Include="TestSceneUeyama.h" />
     <ClInclude Include="TestScene_fujihara.h" />
     <ClInclude Include="TestTitleSceneOno.h" />
+    <ClInclude Include="TestTitleSceneUeyama.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="UI.h" />
   </ItemGroup>

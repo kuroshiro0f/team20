@@ -1,5 +1,6 @@
 #include "TestSceneUeyama.h"
 #include "Result.h"
+#include "TestResultSceneUeyama.h"
 #include "Mark.h"
 #include "Target.h"
 #include "Player.h"
@@ -10,18 +11,33 @@
 
 #include "DxLib.h"
 #include "Effect.h"
-#include "TestScene_fujihara.h"
 
-static int enemyNum = 10;
-static int GIRL_Y = 0;
-static int LADY_Y = 0;
-static int GIRL_MIN_Y = -75;
-static int LADY_MIN_Y = -75;
-static int COUNTDOWN = 6;
-static int GONG_VOLUME_PAL = 30;
+static int enemyNum = 10;					//	エネミーの数
+static int GIRL_Y = 0;						//	中華女子の初期Y座標
+static int LADY_Y = 0;						//	中華女性のY座標
+static int GIRL_MIN_Y = -80;				//	中華女子の最小Y座標
+static int COUNTDOWN = 7;					//	カウントダウンの秒数（+2）
+
+////中華少女の速度
+//static float girlSpeed = 80.0f;
 
 // ターゲットが飛んでくる間隔 (秒単位)
-static const int TARGET_SHOT_INTERVAL = 3;
+const int TARGET_SHOT_INTERVAL = 0;
+// ターゲットの速度を初期化
+static float targetSpeed = 1000.0f;
+
+//	スクリーンのサイズ
+const int SCREEN_SIZE_W = 1920;
+const int SCREEN_SIZE_H = 1080;
+
+//	フェードインの速度
+const int FADE_IN_SPEED = 3;
+//	フェードアウトの速度
+const int FADE_OUT_SPEED = 3;
+
+// 音量調整
+const int GONG_VOLUME_PAL = 30;
+const int DOOR_VOLUME_PAL = 40;
 
 TestSceneUeyama::TestSceneUeyama()
 	:m_player(nullptr)
@@ -34,7 +50,10 @@ TestSceneUeyama::TestSceneUeyama()
 	, m_iceHitFlagBuffer(false)
 	, m_girl_Y(GIRL_Y)
 	, m_lady_Y(LADY_Y)
-	, m_girlUpFlag(true)
+	, m_girlUpFlag(false)
+	, m_fadeInFinishFlag(false)
+	, m_fadeOutFlag(false)
+	, m_fadeOutFinishFlag(false)
 	//　確認用
 	, m_hitCount(0)
 	, m_hitFlag(false)
@@ -50,9 +69,11 @@ TestSceneUeyama::TestSceneUeyama()
 	}
 	m_target[enemyNum] = nullptr;
 
+
+
 	// 開始時のタイムを取得
 	m_startTime = GetNowCount() / 1000;
-
+	// ステートセット(カウントダウンから)
 	m_state = GAME_SCENE_STATE::COUNTDOWN;
 }
 
@@ -61,6 +82,7 @@ TestSceneUeyama::~TestSceneUeyama()
 	delete m_player;	//	プレイヤーのポインタメンバ変数を消去
 	delete m_camera;	//	カメラのポインタメンバ変数を消去
 	delete m_mark;		//	マークのポインタメンバ変数を消去
+	//	メモリの解放処理
 	StopSoundMem(m_finishSoundHandle);
 	DeleteGraph(m_backGraphHandle);
 	DeleteGraph(m_finishGraphHandle);
@@ -69,11 +91,14 @@ TestSceneUeyama::~TestSceneUeyama()
 	DeleteGraph(m_ladyGraphHandle);
 	DeleteSoundMem(m_soundHandle);
 	DeleteSoundMem(m_finishSoundHandle);
+	DeleteSoundMem(m_iceSoundHandle);
+	DeleteSoundMem(m_missSoundHandle);
+	DeleteSoundMem(m_hitSoundHandle);
 	for (int i = 0; i < enemyNum; i++)
 	{
 		delete m_target[i];
-		delete m_score_ui[i];		//  スコアUIへのポインタメンバ変数
-		delete m_hit_ui[i];			//	ヒット判定UIへのポインタメンバ変数
+		delete m_score_ui[i];	
+		delete m_hit_ui[i];		
 	}
 	delete m_target[enemyNum];
 
@@ -81,15 +106,15 @@ TestSceneUeyama::~TestSceneUeyama()
 	delete m_effect;
 }
 
-
-SceneBase* TestSceneUeyama::Update()
+SceneBase* TestSceneUeyama::Update(float _deltaTime)
 {
 
 	// デバッグビルドのみデバッグ関数を呼び出す
 #ifdef _DEBUG
 	DebugKey();
 #endif
-	switch(m_state)
+
+	switch (m_state)
 	{
 	case GAME_SCENE_STATE::COUNTDOWN:
 		if ((COUNTDOWN + 1) - (GetNowCount() / 1000 - m_startTime) <= 1)
@@ -115,6 +140,8 @@ SceneBase* TestSceneUeyama::Update()
 			if (m_target[m_targetCount]->GetIceState() == NO_SHOT)
 			{
 				m_target[m_targetCount]->SetIceState(NOW_SHOT);
+				PlaySoundMem(m_iceSoundHandle, DX_PLAYTYPE_BACK);
+				ChangeVolumeSoundMem(m_volumePal + 20, m_iceSoundHandle);
 			}
 			if (m_target[m_targetCount]->GetIceState() == END_SHOT)
 			{
@@ -124,12 +151,12 @@ SceneBase* TestSceneUeyama::Update()
 		}
 
 		// 現在の番号に応じてエネミーの更新
-		m_target[m_targetCount]->Update();
+		m_target[m_targetCount]->Update(_deltaTime);
 		m_target[m_targetCount]->SetTargetCount(m_targetCount);
 		m_iceHitFlagBuffer = HitChecker::Check(*m_player, *m_target[m_targetCount]);
 		m_target[m_targetCount]->Reaction(m_hit_ui[m_targetCount], m_iceHitFlagBuffer);
 
-		m_player->Update();
+		m_player->Update(_deltaTime);
 
 		m_camera->Update(*m_player);
 
@@ -162,8 +189,12 @@ SceneBase* TestSceneUeyama::Update()
 		}
 		if (m_finishFlag == TRUE)
 		{
+			m_fadeOutFlag = true;
+		}
+		if (m_fadeOutFinishFlag)
+		{
 			// scoreUIのスコアをResultのscore変数にセット
-			return new Result(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
+			return new TestResultSceneUeyama(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
 		}
 		break;
 	default:
@@ -172,24 +203,42 @@ SceneBase* TestSceneUeyama::Update()
 	return this;						//	ゲームシーンを表示し続ける
 }
 
+
 void TestSceneUeyama::Draw()
 {
-	// 背景
+	if (!m_fadeInFinishFlag)
+	{
+		// フェードイン処理
+		for (int i = 0; i < 255; i += FADE_IN_SPEED)
+		{
+			// 描画輝度をセット
+			SetDrawBright(i, i, i);
+
+			PlaySoundMem(m_doorSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+			ChangeVolumeSoundMem(m_volumePal + DOOR_VOLUME_PAL, m_doorSoundHandle);
+
+			// グラフィックを描画
+			DrawGraph(0, 0, m_backGraphHandle, TRUE);
+			DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
+			DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);
+			ScreenFlip();
+		}
+		m_fadeInFinishFlag = true;
+	}
+	//	背景
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);
-	// 操作説明系
-	DrawGraph(0, 0, m_manualGraphHandle, TRUE);							//	操作説明を表示
 	DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
-	DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);//	タイトル画面の背景を表示
+	DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);
 	// 目印となる机
 	m_mark->Mark_Draw();
-	// プレーヤー
-	m_player->Draw();
 	// ターゲット(アイス)
 	for (int i = 0; i <= m_targetCount; i++)
 	{
 		m_target[i]->Draw();
 	}
 
+	// プレーヤー
+	m_player->Draw();
 
 	// 終了時
 	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
@@ -212,23 +261,55 @@ void TestSceneUeyama::Draw()
 		m_target[m_targetCount]->SetHitIce(false);
 	}
 
-	/*m_obstructManager->Draw();*/
-	/*DrawString(0, 0, "ゲーム画面です", GetColor(255, 255, 255));*/
 	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
 	{
-		int Count = (COUNTDOWN) - (GetNowCount() / 1000 - m_startTime);
-		DrawExtendFormatString(960, 540,10.0,10.0, GetColor(255, 0, 0), "%d", Count);
+		// 透過して描画
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 190);
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+		// 透過を元に戻す
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+	DrawGraph(0, 0, m_manualGraphHandle, TRUE);							//	操作説明を表示
+	// カウントダウンの描画
+	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
+	{
+		int Count = (COUNTDOWN)-(GetNowCount() / 1000 - m_startTime);
+		DrawExtendFormatString(960, 540, 10.0, 10.0, GetColor(255, 0, 0), "%d", Count);
+	}
+
+	/*m_obstructManager->Draw();*/
+	/*DrawString(0, 0, "ゲーム画面です", GetColor(255, 255, 255));*/
+
+	// フェードアウト処理
+	if (m_fadeOutFlag)
+	{
+		for (int i = 0; i < 255; i += FADE_OUT_SPEED)
+		{
+			// 描画輝度をセット
+			SetDrawBright(255 - i, 255 - i, 255 - i);
+
+			// グラフィックを描画
+			DrawGraph(0, 0, m_backGraphHandle, FALSE);
+			DrawGraph(0, 0, m_finishGraphHandle, TRUE);
+			DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
+			DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);
+			ScreenFlip();
+		}
+		m_fadeOutFinishFlag = true;
+
 	}
 }
 
 void TestSceneUeyama::Sound()
 {
+	//	ゲーム終了時に効果音を流す
 	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
 		StopSoundMem(m_soundHandle);
 		PlaySoundMem(m_finishSoundHandle, DX_PLAYTYPE_BACK, FALSE);
 		ChangeVolumeSoundMem(m_volumePal + GONG_VOLUME_PAL, m_finishSoundHandle);
 	}
+	//	ゲーム中にBGMを流す
 	if (m_finishFlag == FALSE)
 	{
 		PlaySoundMem(m_soundHandle, DX_PLAYTYPE_BACK, FALSE);
@@ -238,13 +319,21 @@ void TestSceneUeyama::Sound()
 
 void TestSceneUeyama::Load()
 {
-	m_finishGraphHandle = LoadGraph("data/img/gameEnd.png");		//	グラフィックハンドルにゲーム終了文字のイメージをセット
-	m_backGraphHandle = LoadGraph("data/img/gameBack.png");			//	グラフィックハンドルにゲーム画面のイメージをセッ
-	m_soundHandle = LoadSoundMem("data/sound/gameBgm.ogg");			//	サウンドハンドルにゲーム画面のBGMをセット
-	m_finishSoundHandle = LoadSoundMem("data/sound/gameEnd.wav");		//	サウンドハンドルにゲーム終了時の効果音をセット
+	//	グラフィックハンドルにセット
+	m_finishGraphHandle = LoadGraph("data/img/gameEnd.png");		
+	m_backGraphHandle = LoadGraph("data/img/gameBack.png");			
+	m_soundHandle = LoadSoundMem("data/sound/gameBgm.ogg");			
+	m_finishSoundHandle = LoadSoundMem("data/sound/gameEnd.wav");	
 	m_girlGraphHandle = LoadGraph("data/img/chinaGirl.png");
 	m_ladyGraphHandle = LoadGraph("data/img/chinaLady.png");
-	m_manualGraphHandle = LoadGraph("data/img/manual.png");			//	グラフィックハンドルに操作説明のイメージをセット
+	m_manualGraphHandle = LoadGraph("data/img/manual.png");			
+
+	//	サウンドハンドルにセット
+	m_iceSoundHandle = LoadSoundMem("data/sound/throwIce.mp3");		
+	m_hitSoundHandle = LoadSoundMem("data/sound/hitIce.mp3");		
+	m_missSoundHandle = LoadSoundMem("data/sound/missIce.mp3");	
+	m_doorSoundHandle = LoadSoundMem("data/sound/door.ogg");
+
 	int scoreHandle = LoadGraph("data/model/score_ui/score(1).png");
 	m_player = new Player;			//	プレイヤークラスのインスタンスを生成
 	m_camera = new Camera;			//	カメラクラスのインスタンスを生成
@@ -253,6 +342,11 @@ void TestSceneUeyama::Load()
 	{
 		m_target[i] = new Target;
 		m_target[i]->SetInterval(TARGET_SHOT_INTERVAL);
+		m_target[i]->SetAccel(targetSpeed);
+		m_target[i]->SetThrowSound(m_iceSoundHandle);
+		m_target[i]->SetHitSound(m_hitSoundHandle);
+		m_target[i]->SetMissSound(m_missSoundHandle);
+		// m_target[i]->SetAccelVec()
 	}
 
 	for (int i = 0; i < 2; ++i)
@@ -266,7 +360,7 @@ void TestSceneUeyama::Load()
 	// UIクラスのprivateメンバ変数に画像ハンドルをロード
 	m_score_ui[0]->Load();
 
-	m_effect = new PlayEffect("data/effects/FeatherBomb.efk");
+	m_effect = new PlayEffect("data/effects/FeatherBomb.efk", 5.0f);
 
 }
 
@@ -308,4 +402,3 @@ void TestSceneUeyama::DebugKey()
 		m_finishFlag = TRUE;
 	}
 }
-

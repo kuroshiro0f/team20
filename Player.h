@@ -17,7 +17,7 @@ public:
 
 	bool KeyPush;			//キーを押したかどうか
 
-	void Update();			// 更新.
+	void Update(float _deltaTime);			// 更新.
 	void Draw();			// 描画.
 
 	// 衝突処理.
