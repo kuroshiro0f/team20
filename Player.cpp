@@ -20,6 +20,9 @@ const float Player::GRIP_DECEL			= -0.025f;		// グリップの減速.
 const float Player::GRIP_POWER			= 0.1f;			// グリップ力.
 const float Player::COLIDE_DECEL_FAC	= 0.4f;			// 障害物にぶつかったときの減速率.
 
+//	音量
+const int VOLUME_PAL = 100;
+
 //-----------------------------------------------------------------------------
 // @brief  コンストラクタ.
 //-----------------------------------------------------------------------------
@@ -80,6 +83,7 @@ void Player::Update(float _deltaTime)
 	if (CheckHitKey(KEY_INPUT_SPACE)&& !KeyPush)
 	{
 		PlaySoundMem(m_sHandle, DX_PLAYTYPE_BACK);
+		ChangeVolumeSoundMem(VOLUME_PAL, m_sHandle);
 		KeyPush = true;
 	}
 
@@ -88,8 +92,8 @@ void Player::Update(float _deltaTime)
 		accelVec = VScale(dir, ACCEL);
 	}
 
-	// z座標が215を超えたら所定の位置に戻る
-	if (VSize(pos) > VSize(VGet(0, 0, 215)))
+	// z座標が415を超えたら所定の位置に戻る
+	if (VSize(pos) > VSize(VGet(0, 0, 415)))
 	{
 		// キーが押されていない状態にする
 		KeyPush = false;

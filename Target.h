@@ -31,6 +31,8 @@ public:
 	// ポジションのgetter/setter.
 	const VECTOR& GetPos() const { return pos; }
 	void SetPos(const VECTOR set) { pos = set; }
+	void SetSinglePosX() { m_posX = pos.x; }
+	const int GetPosX() { return m_posX; }
 
 	// ディレクションのgetter/setter.
 	const VECTOR& GetDir() const { return dir; }
@@ -66,6 +68,7 @@ private:
 	int		modelHandle;	// モデルハンドル.
 	int		m_FontHandle;	// フォントハンドル
 	VECTOR	pos;			// ポジション.
+	int m_posX;
 
 	VECTOR	velocity;		// 移動力.
 	VECTOR	accelVec;

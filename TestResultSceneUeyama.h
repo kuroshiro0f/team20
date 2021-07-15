@@ -8,8 +8,6 @@
 
 #include "DxLib.h"
 
-//using namespace std;
-
 class TestResultSceneUeyama : public SceneBase
 {
 public:

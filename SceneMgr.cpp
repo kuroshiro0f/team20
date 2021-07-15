@@ -1,7 +1,6 @@
 #include "SceneMgr.h"
 #include "Title.h"
 #include "Result.h"
-#include "Game.h"
 #include "TestSceneUeyama.h"
 
 #include "DxLib.h"

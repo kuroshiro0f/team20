@@ -1,6 +1,5 @@
 #include "TestTitleSceneUeyama.h"
 #include "DxLib.h"
-#include "Game.h"
 #include "GameScene_easy.h"
 #include "GameScene_normal.h"
 #include "GameScene_hard.h"
@@ -139,20 +138,20 @@ SceneBase* TestTitleSceneUeyama::Update(float _deltaTime)
 		if (m_cursolNum == 0 && m_fadeOutFinishFlag)
 		{
 			// イージーモードシーンのインスタンスを返す
-			return new TestSceneUeyama();
+			return new GameSceneEasy();
 		}
 
-		//if (m_cursolNum == 1 && m_fadeOutFinishFlag)
-		//{
-		//	// ノーマルモードのインスタンスを返す
-		//	return new GameSceneNormal();
-		//}
+		if (m_cursolNum == 1 && m_fadeOutFinishFlag)
+		{
+			// ノーマルモードのインスタンスを返す
+			return new GameSceneNormal();
+		}
 
-		//if (m_cursolNum == 2 && m_fadeOutFinishFlag)
-		//{
-		//	// ハードモードのインスタンスを返す
-		//	return new GameSceneHard();
-		//}
+		if (m_cursolNum == 2 && m_fadeOutFinishFlag)
+		{
+			// ハードモードのインスタンスを返す
+			return new GameSceneHard();
+		}
 
 		break;
 

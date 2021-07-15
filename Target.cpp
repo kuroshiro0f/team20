@@ -19,6 +19,8 @@ const int Target::m_font_thick = -1;
 
 static const double pi = 3.141592653589793;
 
+// 音量
+const int VOLUME_PAL = 100;
 
 //-----------------------------------------------------------------------------
 // @brief  コンストラクタ.
@@ -160,6 +162,7 @@ void Target::Reaction(UI* _ui, bool _hitFlag)
 		ScoreUpdateUI(*_ui, _hitFlag);
 
 		PlaySoundMem(m_hitIceSoundHandle, DX_PLAYTYPE_BACK);
+		ChangeVolumeSoundMem(VOLUME_PAL, m_hitIceSoundHandle);
 
 		// ３Dモデルのポジション設定
 		MV1SetPosition(modelHandle, pos);
@@ -173,6 +176,7 @@ void Target::Reaction(UI* _ui, bool _hitFlag)
 			ScoreUpdateUI(*_ui, _hitFlag);
 
 			PlaySoundMem(m_missIceSoundHandle, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(VOLUME_PAL, m_missIceSoundHandle);
 
 			// ３Dモデルのポジション設定
 			MV1SetPosition(modelHandle, pos);
