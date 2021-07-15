@@ -16,9 +16,9 @@ SceneMgr::~SceneMgr()
 	delete m_scene;			//	メンバ変数の消去
 }
 
-void SceneMgr::Update()
+void SceneMgr::Update(float _deltaTime)
 {
-	SceneBase* tmpScene = m_scene->Update();		//	現在のシーンを保存(publicの関数・変数を呼び出すときはアロー演算子(->)　要調査)
+	SceneBase* tmpScene = m_scene->Update(_deltaTime);		//	現在のシーンを保存(publicの関数・変数を呼び出すときはアロー演算子(->)　要調査)
 	if (tmpScene != m_scene)						//	シーンが切り替わった時
 	{
 		delete m_scene;								//	直前のシーンを消す

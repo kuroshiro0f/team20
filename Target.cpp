@@ -60,7 +60,7 @@ Target::~Target()
 //-----------------------------------------------------------------------------
 // @brief  更新.
 //-----------------------------------------------------------------------------
-void Target::Update()
+void Target::Update(float _deltaTime)
 {
 	if (m_iceState==END_SHOT)
 	{
@@ -74,13 +74,11 @@ void Target::Update()
 		
 	}
 	
-
 	// ベロシティ加速計算.
 	velocity = VAdd(velocity, accelVec);
 
-
 	// 上下方向にいかないようにベロシティを整える.
-	velocity = VGet(velocity.x, 0, velocity.z);
+	velocity = VGet(velocity.x * _deltaTime, 0, velocity.z * _deltaTime);
 
 	// ポジションを更新.
 	pos = VAdd(pos, velocity);

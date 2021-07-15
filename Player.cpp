@@ -7,7 +7,7 @@
 #include "Effect.h"
 
 // 静的定数.
-const float Player::ACCEL				= 0.3f;		// 通常の加速.
+const float Player::ACCEL				= 500.0f;		// 通常の加速.
 
 //
 int Player::m_sHandle;
@@ -68,7 +68,7 @@ Player::~Player()
 //-----------------------------------------------------------------------------
 // @brief  更新.
 //-----------------------------------------------------------------------------
-void Player::Update()
+void Player::Update(float _deltaTime)
 {
 	// キー入力取得
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
@@ -89,7 +89,7 @@ void Player::Update()
 	}
 
 	// z座標が215を超えたら所定の位置に戻る
-	if (VSize(pos) > VSize(VGet(0, 0, 2150)))
+	if (VSize(pos) > VSize(VGet(0, 0, 215)))
 	{
 		// キーが押されていない状態にする
 		KeyPush = false;
@@ -124,7 +124,7 @@ void Player::Update()
 	}
 
 	// 上下方向にいかないようにベロシティを整える.
-	velocity = VGet(velocity.x, 0, velocity.z);
+	velocity = VGet(velocity.x * _deltaTime, 0, velocity.z * _deltaTime);
 
 	// ポジションを更新.
 	pos = VAdd(pos, velocity);

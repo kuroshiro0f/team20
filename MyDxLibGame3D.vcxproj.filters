@@ -82,6 +82,12 @@
     <ClCompile Include="GameScene_hard.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="TestTitleSceneUeyama.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="TestResultSceneUeyama.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -148,6 +154,12 @@
       <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="GameScene_normal.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TestTitleSceneUeyama.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TestResultSceneUeyama.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
