@@ -10,6 +10,7 @@
 #include "TestSceneKoga.h"
 #include "TestSceneOno.h"
 #include "TestTitleSceneOno.h"
+#include "TestScene_fujihara.h"
 #include "EffekseerForDXLib.h"
 void InitializeEffekseer();
 
@@ -33,7 +34,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SceneMgr* Scene = new SceneMgr;
 
 	//	タイトルシーンをセット
-	Scene->SetScene(new TestTitleScene);
+	Scene->SetScene(new TestScene_fujihara);
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)

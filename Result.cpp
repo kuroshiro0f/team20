@@ -23,36 +23,36 @@ Result::Result(const int &_score)
 	if (m_score < NICE_P)
 	{
 		m_evaluation = 0;
-		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/NEVERGIVEUP.png");		//	グラフィックハンドルにリザルト画面のイメージをセット
+		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/result_02_png/Result _01_neverGiveLogo.png");		//	グラフィックハンドルにリザルト画面のイメージをセット
 		m_evaluationSoundHandle[m_evaluation] = LoadSoundMem("data/sound/NGU.mp3");			//	サウンドハンドルにリザルト画面の効果音をセット
 	}
 	if (m_score >= NICE_P && m_score < PF_P)
 	{
 		m_evaluation = 1;
-		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/NICE.png");				//	グラフィックハンドルにリザルト画面のイメージをセット
+		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/result_02_png/Result _01_niceLogo.png");				//	グラフィックハンドルにリザルト画面のイメージをセット
 		m_evaluationSoundHandle[m_evaluation] = LoadSoundMem("data/sound/NICE.mp3");		//	サウンドハンドルにリザルト画面の効果音をセット
 	}
 	if (m_score == PF_P)
 	{
 		m_evaluation = 2;
-		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/PERFECT.png");			//	グラフィックハンドルにリザルト画面のイメージをセット
+		m_evaluationGraphHandle[m_evaluation] = LoadGraph("data/img/result_02_png/Result _01_perfectLogo.png");			//	グラフィックハンドルにリザルト画面のイメージをセット
 		m_evaluationSoundHandle[m_evaluation] = LoadSoundMem("data/sound/PF.mp3");			//	サウンドハンドルにリザルト画面の効果音をセット
 	}
 	/*m_scoreStr(std::to_string(m_score));*/
-	m_logoGraphHandle = LoadGraph("data/img/Result_logo.png");				//	グラフィックハンドルにリザルト画面のイメージをセット
-	m_scoreGraphHandle = LoadGraph("data/img/Result_score.png");			//	グラフィックハンドルにリザルト画面のイメージをセット
-	m_guidanceGraphHandle = LoadGraph("data/img/Result_guidance.png");		//	グラフィックハンドルにリザルト画面のイメージをセット
-	m_numGraphHandle[0] = LoadGraph("data/img/0.png");
-	m_numGraphHandle[1] = LoadGraph("data/img/1.png");
-	m_numGraphHandle[2] = LoadGraph("data/img/2.png");
-	m_numGraphHandle[3] = LoadGraph("data/img/3.png");
-	m_numGraphHandle[4] = LoadGraph("data/img/4.png");
-	m_numGraphHandle[5] = LoadGraph("data/img/5.png");
-	m_numGraphHandle[6] = LoadGraph("data/img/6.png");
-	m_numGraphHandle[7] = LoadGraph("data/img/7.png");
-	m_numGraphHandle[8] = LoadGraph("data/img/8.png");
-	m_numGraphHandle[9] = LoadGraph("data/img/9.png");
-	m_numGraphHandle[10] = LoadGraph("data/img/10.png");
+	m_logoGraphHandle = LoadGraph("data/img/result_02_png/Result _01_backGround.png");				//	グラフィックハンドルにリザルト画面のイメージをセット
+	// m_scoreGraphHandle = LoadGraph("data/img/Result_score.png");			//	グラフィックハンドルにリザルト画面のイメージをセット
+	m_guidanceGraphHandle = LoadGraph("data/img/result_02_png/Result_01_EnterLogo.png");		//	グラフィックハンドルにリザルト画面のイメージをセット
+	m_numGraphHandle[0] = LoadGraph("data/img/result_02_png/Result.png");
+	m_numGraphHandle[1] = LoadGraph("data/img/result_02_png/Result_01_ice02.png");
+	m_numGraphHandle[2] = LoadGraph("data/img/result_02_png/Result_01_ice03.png");
+	m_numGraphHandle[3] = LoadGraph("data/img/result_02_png/Result_01_ice04.png");
+	m_numGraphHandle[4] = LoadGraph("data/img/result_02_png/Result_01_ice05.png");
+	m_numGraphHandle[5] = LoadGraph("data/img/result_02_png/Result_01_ice06.png");
+	m_numGraphHandle[6] = LoadGraph("data/img/result_02_png/Result_01_ice07.png");
+	m_numGraphHandle[7] = LoadGraph("data/img/result_02_png/Result_01_ice08.png");
+	m_numGraphHandle[8] = LoadGraph("data/img/result_02_png/Result_01_ice09.png");
+	m_numGraphHandle[9] = LoadGraph("data/img/result_02_png/Result_01_ice10.png");
+	m_numGraphHandle[10] = LoadGraph("data/img/result_02_png/Result_01_ice11.png");
 	//m_bgmSoundHandle = LoadSoundMem("");									//	サウンドハンドルにリザルト画面のBGMをセット
 	m_scoreSoundHandle = LoadSoundMem("data/sound/score.mp3");				//	サウンドハンドルにリザルト画面の効果音をセット
 	m_numSoundHandle = LoadSoundMem("data/sound/num.mp3");					//	サウンドハンドルにリザルト画面の効果音をセット
@@ -125,7 +125,7 @@ SceneBase* Result::Update()
 		permeationAmount *= transModeration;
 	}
 	// 毎透過量を透過量に加算する
-	transParent += permeationAmount;
+	transParent += (permeationAmount * 3);
 
 	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
 	{
@@ -151,7 +151,13 @@ void Result::Draw()
 	}
 	if (m_checkResultFlag >= 2)
 	{
-		DrawGraph(0, 0, m_numGraphHandle[m_score], TRUE);				//	リザルト画面のロゴを表示
+		if (m_score != 0)
+		{
+			for (int i = m_score - 1; i >= 0; --i)
+			{
+				DrawGraph(0, 0, m_numGraphHandle[i], TRUE);				//	リザルト画面のロゴを表示
+			}
+		}
 	}
 	if (m_checkResultFlag >= 3)
 	{
