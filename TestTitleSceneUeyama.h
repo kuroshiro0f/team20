@@ -40,6 +40,10 @@ private:
 	int m_click_sound_handle;			//  ENTERで進むときのサウンドハンドル
 										// 毎フレーム透過量
 	int m_permeationAmount;
+
+	//	アルファ値
+	int m_alphaVal;
+
 	// 透過量
 	int m_transpVal;
 	int m_fadeTransVal;				//	フェードアウト中の透過量

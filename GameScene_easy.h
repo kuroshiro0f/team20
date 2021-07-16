@@ -9,8 +9,10 @@ public:
 
 	enum class GAME_SCENE_STATE
 	{
+		FADE_IN,
 		COUNTDOWN,
-		GAME
+		GAME,
+		FADE_OUT
 	};
 
 	GameSceneEasy();				//	コンストラクタ
@@ -50,6 +52,10 @@ private:
 	int m_ladyGraphHandle;
 	int m_girl_missReaction_GraphHandle;	//  ミスした時の女の子に追加する画像ハンドル
 	int m_girl_hitReaction_GraphHandle;		//  成功した時の女の子に追加する画像ハンドル
+
+	//	アルファ値
+	int m_alphaVal;
+
 	//float m_deltaTime;				//	デルタタイム
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_finishFlag;				//	ゲーム終了判定フラグ
@@ -59,6 +65,7 @@ private:
 	bool m_fadeInFinishFlag;		//	フェードインの終了判定フラグ
 	bool m_fadeOutFlag;				//	フェードアウト開始用のフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
+	bool m_loadFinishFlag;
 
 	bool m_girl_hitReactionFlag;	//  女の子のhitした時のリアクションをするかどうか
 	bool m_girl_missReactionFlag;	//  女の子のmissした時のアクションをするかどうか
