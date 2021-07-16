@@ -11,8 +11,10 @@ public:
 
 	enum class GAME_SCENE_STATE
 	{
+		FADE_IN,
 		COUNTDOWN,
-		GAME
+		GAME,
+		FADE_OUT
 	};
 
 	SceneBase* Update(float _deltaTime)override;	//	更新
@@ -31,10 +33,14 @@ private:
 	class UI* m_score_ui[10];		//  UIクラスへのポインタメンバ変数
 	class UI* m_hit_ui[10];			//	ヒット判定UIクラスへのポインタメンバ変数
 	class PlayEffect* m_effect;     //  エフェクトプレーヤー
+	class PlayEffect* m_mark_effect;//  机につける的のエフェクト
 	GAME_SCENE_STATE m_state;
 	int m_targetCount;				//	アイスの飛ばした個数
 	int m_startTime;				//	ゲームの開始時間
-	int m_girl_Y;					//	
+	int m_girl_X;					//	女の子のポジションY
+	int m_girl_Y;					//	女の子のポジションX
+	int m_girl_moveY;				//  女の子がY座標に動く量
+	int m_girl_moveX;				//  女の子がX座標に動く量
 	int m_lady_Y;
 	int m_backGraphHandle;			//	背景のグラフィックハンドル
 	int m_finishGraphHandle;		//	ゲーム終了文字のグラフィックハンドル
@@ -49,6 +55,10 @@ private:
 	int m_ladyGraphHandle;
 	int m_girl_missReaction_GraphHandle;	//  ミスした時の女の子に追加する画像ハンドル
 	int m_girl_hitReaction_GraphHandle;		//  成功した時の女の子に追加する画像ハンドル
+
+	//	アルファ値
+	int m_alphaVal;
+
 	//float m_deltaTime;				//	デルタタイム
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_finishFlag;				//	ゲーム終了判定フラグ
@@ -58,6 +68,7 @@ private:
 	bool m_fadeInFinishFlag;		//	フェードインの終了判定フラグ
 	bool m_fadeOutFlag;				//	フェードアウト開始用のフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
+	bool m_loadFinishFlag;
 
 	bool m_girl_hitReactionFlag;	//  女の子のhitした時のリアクションをするかどうか
 	bool m_girl_missReactionFlag;	//  女の子のmissした時のアクションをするかどうか

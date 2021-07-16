@@ -12,23 +12,25 @@ const int NICE_P = 5;
 const int PF_P = 10;
 const int VOLUME_PAL_SUP = 90;
 
+const int SCREEN_SIZE_W = 1920;
+const int SCREEN_SIZE_H = 1080;
+
 // 最大透過量
 const int defaultTrans = 255;
 // 透過量変化用ベクトル
 const int transModeration = -1;
 
-//	フェードインの速度
-const int FADE_IN_SPEED = 3;
-//	フェードアウトの速度
-const int FADE_OUT_SPEED = 3;
+const int addAlphaVal = 5;
 
 Result::Result(const int& _score)
-	:m_score(m_score)
+	:m_score(_score)
 	,m_checkResultFlag(0)
 	, m_ice_draw_num(0)
+	, m_alphaVal(255)
 	, m_fadeInFinishFlag(false)
 	, m_fadeOutFlag(false)
 	, m_fadeOutFinishFlag(false)
+	, m_loadFinishFlag(false)
 {
 	// 透過量変数を255に設定
 	transParent = defaultTrans;
@@ -67,105 +69,98 @@ Result::~Result()
 
 SceneBase* Result::Update(float _deltaTime)
 {
-	if (CheckHitKey(KEY_INPUT_UP))
+	/*if (CheckHitKey(KEY_INPUT_UP))
 	{
 		m_volumePal++;
 	}
 	if (CheckHitKey(KEY_INPUT_DOWN))
 	{
 		m_volumePal--;
-	}
+	}*/
 	/*m_scoreStr(std::to_string(m_score));*/
-
-	//  RESULT_NUM以下ならば
-	if (m_checkResultFlag <= RESULT_NUM)
+	if (m_fadeInFinishFlag)
 	{
-		
-		if (m_checkResultFlag <= 1||m_checkResultFlag == 3)
+		//  RESULT_NUM以下ならば
+		if (m_checkResultFlag <= RESULT_NUM)
 		{
-			WaitTimer(1000);
-			//  時間でUIが描画されるようにするFlag
-			m_checkResultFlag++;
-		}
-		if (m_checkResultFlag == 2)
-		{
-			//  iceの画像の座標が0になったら
-			if (m_numGraphY[m_ice_draw_num] >= 0)
-			{
-				m_numGraphY[m_ice_draw_num] = 0;
-				if (m_ice_draw_num < m_score) 
-				{
-					// 次のICEの描画に移る
-					m_ice_draw_num++;
-					if (m_numGraphY[m_score - 1] == 0)
-					{
-						m_ice_draw_num--;
-						WaitTimer(1000);
-						//  時間でUIが描画されるようにするFlag
-						m_checkResultFlag++;
-					}
-				}
-			}
-			else
-			{
-				m_numGraphY[m_ice_draw_num] += ICE_VEC_Y;
-			}
-			if (m_score == 0)
+			if (m_checkResultFlag <= 1 || m_checkResultFlag == 3)
 			{
 				WaitTimer(1000);
+				//  時間でUIが描画されるようにするFlag
 				m_checkResultFlag++;
 			}
+			if (m_checkResultFlag == 2)
+			{
+				//  iceの画像の座標が0になったら
+				if (m_numGraphY[m_ice_draw_num] >= 0)
+				{
+					m_numGraphY[m_ice_draw_num] = 0;
+					if (m_ice_draw_num < m_score)
+					{
+						// 次のICEの描画に移る
+						m_ice_draw_num++;
+						if (m_numGraphY[m_score - 1] == 0)
+						{
+							m_ice_draw_num--;
+							WaitTimer(1000);
+							//  時間でUIが描画されるようにするFlag
+							m_checkResultFlag++;
+						}
+					}
+				}
+				else
+				{
+					m_numGraphY[m_ice_draw_num] += ICE_VEC_Y;
+				}
+				if (m_score == 0)
+				{
+					WaitTimer(1000);
+					m_checkResultFlag++;
+				}
+			}
 		}
-	}
 
 
-	if (!CheckHitKey(KEY_INPUT_RETURN))
-	{
-		m_checkKeyFlag = FALSE;
-	}
+		if (!CheckHitKey(KEY_INPUT_RETURN))
+		{
+			m_checkKeyFlag = FALSE;
+		}
 
-	// 透過量が255より大きくなったら
-	if (transParent >= defaultTrans)
-	{
-		// 透過量を121に設定
-		transParent = defaultTrans - 1;
-		// 毎透過量を-1にする
-		permeationAmount *= transModeration;
-	}
-	// 透過量が0より小さければ
-	else if (0 >= transParent)
-	{
-		// 透過量を１に設定
-		transParent = 1;
-		// 毎透過量を1にする
-		permeationAmount *= transModeration;
-	}
-	// 毎透過量を透過量に加算する
-	transParent += (permeationAmount * 3);
+		// 透過量が255より大きくなったら
+		if (transParent >= defaultTrans)
+		{
+			// 透過量を121に設定
+			transParent = defaultTrans - 1;
+			// 毎透過量を-1にする
+			permeationAmount *= transModeration;
+		}
+		// 透過量が0より小さければ
+		else if (0 >= transParent)
+		{
+			// 透過量を１に設定
+			transParent = 1;
+			// 毎透過量を1にする
+			permeationAmount *= transModeration;
+		}
+		// 毎透過量を透過量に加算する
+		transParent += (permeationAmount * 3);
 
-	if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
-	{
-		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_click_sound_handle);
-		PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);		//	音が再生し終わるまで待機
-		return new TestTitleSceneUeyama;
+		if (CheckHitKey(KEY_INPUT_RETURN) && m_checkKeyFlag == FALSE)
+		{
+			ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_click_sound_handle);
+			PlaySoundMem(m_click_sound_handle, DX_PLAYTYPE_NORMAL);		//	音が再生し終わるまで待機
+			m_fadeOutFlag = true;
+		}
+		if (m_fadeOutFinishFlag)
+		{
+			return new TestTitleSceneUeyama;
+		}
 	}
 	return this;
 }
 
 void Result::Draw()
 {
-	if (!m_fadeInFinishFlag)
-	{
-		// フェードイン処理
-		for (int i = 0; i < 255; i += FADE_IN_SPEED)
-		{
-			// 描画輝度をセット
-			SetDrawBright(i, i, i);
-			DrawGraph(0, 0, m_logoGraphHandle, TRUE);
-			ScreenFlip();
-		}
-		m_fadeInFinishFlag = true;
-	}
 	DrawGraph(LOGO_X, LOGO_Y, m_logoGraphHandle, TRUE);					//	リザルト画面のロゴを表示
 
 	
@@ -179,7 +174,7 @@ void Result::Draw()
 		{
 			for (int i = 0; i <= m_ice_draw_num; ++i)
 			{
-				DrawGraph(0, m_numGraphY[i], m_numGraphHandle[i], TRUE);				//	リザルト画面のロゴを表示
+				DrawGraph(0, m_numGraphY[i], m_numGraphHandle[i], TRUE);				//	打ち落とした数のアイスを描画
 			}
 		}
 	}
@@ -192,19 +187,46 @@ void Result::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		DrawGraph(0, 0, m_evaluationGraphHandle[m_evaluation], TRUE);				//	リザルト画面のロゴを表示
 	}
-	// フェードアウト処理
+	if (!m_fadeInFinishFlag)
+	{
+		// アルファ値の減算
+		m_alphaVal -= addAlphaVal;
+
+		// アルファブレンド有効化(ここでアルファ値をセット)
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
+
+		// 画面全体に任意のカラーの四角形を描画
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+
+		// アルファブレンド無効化
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		// アルファ値が最大(255)になったらフェードアウト終了
+		if (m_alphaVal <= 0)
+		{
+			m_fadeInFinishFlag = true;
+		}
+	}
+	// フェードアウト開始
 	if (m_fadeOutFlag)
 	{
-		for (int i = 0; i < 255; i += FADE_OUT_SPEED)
-		{
-			// 描画輝度をセット
-			SetDrawBright(255 - i, 255 - i, 255 - i);
+		// アルファ値の加算
+		m_alphaVal += addAlphaVal;
 
-			// グラフィックを描画
-			DrawGraph(0, 0, m_logoGraphHandle, FALSE);
-			ScreenFlip();
+		// アルファブレンド有効化(ここでアルファ値をセット)
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
+
+		// 画面全体に任意のカラーの四角形を描画
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+
+		// アルファブレンド無効化
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		// アルファ値が最大(255)になったらフェードアウト終了
+		if (m_alphaVal >= 255)
+		{
+			m_fadeOutFinishFlag = true;
 		}
-		m_fadeOutFinishFlag = true;
 	}
 }
 
@@ -217,10 +239,12 @@ void Result::Sound()
 		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_scoreSoundHandle);
 		break;
 	case 2:
-		PlaySoundMem(m_numSoundHandle, DX_PLAYTYPE_BACK, TRUE);
-		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_numSoundHandle);
+		// アイスが落ちるときの音を流す
+		/*PlaySoundMem(m_numSoundHandle, DX_PLAYTYPE_BACK, TRUE);
+		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_numSoundHandle);*/
 		break;
 	case 3:
+		//	評価を表示するときの音
 		PlaySoundMem(m_evaluationSoundHandle[m_evaluation], DX_PLAYTYPE_BACK, TRUE);
 		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_evaluationSoundHandle[m_evaluation]);
 		break;

@@ -12,16 +12,17 @@
 #include "Effect.h"
 
 static int enemyNum = 10;					//	エネミーの数
+static int GIRL_X = 0;						//  中華女子の初期X座標
 static int GIRL_Y = 0;						//	中華女子の初期Y座標
 static int LADY_Y = 0;						//	中華女性のY座標
 static int GIRL_MIN_Y = -80;				//	中華女子の最小Y座標
-static int COUNTDOWN = 7;					//	カウントダウンの秒数（+2）
+static int COUNTDOWN = 5;					//	カウントダウンの秒数（+2）
 
 ////中華少女の速度
 //static float girlSpeed = 80.0f;
 
 // ターゲットが飛んでくる間隔 (秒単位)
-const int TARGET_SHOT_INTERVAL = 0;
+const int TARGET_SHOT_INTERVAL = 2;
 // ターゲットの速度を初期化
 static float targetSpeed = 400.0f;
 
@@ -29,10 +30,8 @@ static float targetSpeed = 400.0f;
 const int SCREEN_SIZE_W = 1920;
 const int SCREEN_SIZE_H = 1080;
 
-//	フェードインの速度
-const int FADE_IN_SPEED = 3;
-//	フェードアウトの速度
-const int FADE_OUT_SPEED = 3;
+// フェードイン・フェードアウトの速度
+const int addAlphaVal = 5;
 
 // 音量調整
 const int GONG_VOLUME_PAL = 30;
@@ -43,16 +42,21 @@ GameSceneHard::GameSceneHard()
 	, m_camera(nullptr)
 	, m_mark(nullptr)
 	, m_effect(nullptr)
+	, m_mark_effect(nullptr)
 	, m_targetCount(0)
 	, m_startTime(0)
+	, m_alphaVal(255)
 	, m_iceThrowFlag(false)
 	, m_iceHitFlagBuffer(false)
+	, m_girl_X(GIRL_X)
 	, m_girl_Y(GIRL_Y)
+	, m_girl_moveX(0)
+	, m_girl_moveY(1)
 	, m_lady_Y(LADY_Y)
 	, m_girlUpFlag(false)
-	, m_fadeInFinishFlag(false)
 	, m_fadeOutFlag(false)
 	, m_fadeOutFinishFlag(false)
+	, m_loadFinishFlag(false)
 	, m_girl_hitReactionFlag(false)
 	, m_girl_missReactionFlag(false)
 	, m_girl_ReactionFlag(false)
@@ -75,8 +79,8 @@ GameSceneHard::GameSceneHard()
 
 	// 開始時のタイムを取得
 	m_startTime = GetNowCount() / 1000;
-	// ステートセット(カウントダウンから)
-	m_state = GAME_SCENE_STATE::COUNTDOWN;
+	// ステートセット(フェードインから)
+	m_state = GAME_SCENE_STATE::FADE_IN;
 }
 
 GameSceneHard::~GameSceneHard()
@@ -107,6 +111,11 @@ GameSceneHard::~GameSceneHard()
 	}
 	delete m_target[enemyNum];
 
+	//  机の的エフェクトのメモリ開放
+	m_mark_effect->Delete();
+	delete m_mark_effect;
+
+	m_effect->StopEffect();
 	m_effect->Delete();
 	delete m_effect;
 }
@@ -120,6 +129,8 @@ SceneBase* GameSceneHard::Update(float _deltaTime)
 
 	switch (m_state)
 	{
+	case GAME_SCENE_STATE::FADE_IN:
+		break;
 	case GAME_SCENE_STATE::COUNTDOWN:
 		if ((COUNTDOWN + 1) - (GetNowCount() / 1000 - m_startTime) <= 1)
 		{
@@ -154,6 +165,9 @@ SceneBase* GameSceneHard::Update(float _deltaTime)
 				m_girl_ReactionFlag = false;						// 女の子がリアクションしないようにする
 				m_girl_hitReactionFlag = false;
 				m_girl_missReactionFlag = false;
+				m_girl_X = GIRL_X;									// 女の子の座標を戻す
+				m_girl_moveX = 0;									// 女の子がX座標に動く量をデフォルトに戻す
+				m_girl_moveY = 1;									// 女の子がY座標に動く量をデフォルトに戻す
 				m_target[m_targetCount + 1]->SetSetTime(m_startTime);
 				m_targetCount++;
 			}
@@ -172,11 +186,14 @@ SceneBase* GameSceneHard::Update(float _deltaTime)
 			{
 				m_girl_ReactionFlag = true;			// 女の子がリアクションする
 				m_girl_hitReactionFlag = true;		// 女の子がHITした時のリアクションをする
+				m_girl_moveY = 3;					// 女の子のY座標に動く速度を上げる
 			}
 			else if (m_target[m_targetCount]->GetPosX() <= -80)
 			{
 				m_girl_ReactionFlag = true;			// 女の子がリアクションする
 				m_girl_missReactionFlag = true;		// 女の子がmissした時のリアクションをする
+				m_girl_Y = 0;						// 女の子のY座標をデフォルトにする
+				m_girl_moveX = 3;
 			}
 		}
 		m_target[m_targetCount]->Reaction(m_hit_ui[m_targetCount], m_iceHitFlagBuffer);
@@ -186,42 +203,75 @@ SceneBase* GameSceneHard::Update(float _deltaTime)
 		m_camera->Update(*m_player);
 
 
-		// UIの中華娘を動かす
-		if (m_girlUpFlag)
+		//  女の子がmissしたときのリアクションをしないなら
+		if (!m_girl_missReactionFlag)
 		{
-			m_girl_Y--;
-			if (m_girl_Y < GIRL_MIN_Y)
+			// UIの中華娘を動かす
+			if (m_girlUpFlag)
 			{
-				m_girl_Y = GIRL_MIN_Y;
-				m_girlUpFlag = false;
+				m_girl_Y -= m_girl_moveY;		//  女の子の座標をm_girl_moveY減らす
+				if (m_girl_Y < GIRL_MIN_Y)
+				{
+					m_girl_Y = GIRL_MIN_Y;
+					m_girlUpFlag = false;
+				}
+			}
+			else if (!m_girlUpFlag)
+			{
+				m_girl_Y += m_girl_moveY;		//  女の子の座標をm_girl_moveY増やす
+				if (m_girl_Y > 0)
+				{
+					m_girl_Y = 0;
+					m_girlUpFlag = true;
+				}
 			}
 		}
-		else if (!m_girlUpFlag)
+		//  リアクションするなら
+		else
 		{
-			m_girl_Y++;
-			if (m_girl_Y > 0)
+			//  X座標が０未満なら
+			if (m_girl_X < 0)
 			{
-				m_girl_Y = 0;
-				m_girlUpFlag = true;
+				//  X座標を０にする
+				m_girl_X = 0;
+				//  moveXのベクトルを逆にする
+				m_girl_moveX *= -1;
 			}
+			//  X座標が５０以上なら
+			else if (50 < m_girl_X)
+			{
+				//  X座標を50にする
+				m_girl_X = 50;
+				//  moveXのベクトルを逆にする
+				m_girl_moveX *= -1;
+			}
+			//  女の子のX座標を動かす
+			m_girl_X += m_girl_moveX;
 		}
 
 
 
 		if (m_targetCount == enemyNum)
 		{
+			m_mark_effect->StopEffect();
 			m_finishFlag = TRUE;
 		}
 		if (m_finishFlag == TRUE)
 		{
 			m_fadeOutFlag = true;
 		}
+		if (m_fadeOutFlag)
+		{
+			m_state = GAME_SCENE_STATE::FADE_OUT;
+		}
+		break;
+	case GAME_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
 			// scoreUIのスコアをResultのscore変数にセット
 			return new Result(m_score_ui[m_targetCount]->GetScore());				//	リザルトシーンに切り替える
 		}
-		break;
+			break;
 	default:
 		break;
 	}
@@ -230,36 +280,17 @@ SceneBase* GameSceneHard::Update(float _deltaTime)
 
 void GameSceneHard::Draw()
 {
-	if (!m_fadeInFinishFlag)
-	{
-		// フェードイン処理
-		for (int i = 0; i < 255; i += FADE_IN_SPEED)
-		{
-			// 描画輝度をセット
-			SetDrawBright(i, i, i);
-
-			PlaySoundMem(m_doorSoundHandle, DX_PLAYTYPE_BACK, FALSE);
-			ChangeVolumeSoundMem(m_volumePal + DOOR_VOLUME_PAL, m_doorSoundHandle);
-
-			// グラフィックを描画
-			DrawGraph(0, 0, m_backGraphHandle, TRUE);
-			DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
-			DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);
-			ScreenFlip();
-		}
-		m_fadeInFinishFlag = true;
-	}
 	//	背景
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);
-	DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
+	DrawGraph(m_girl_X, m_girl_Y, m_girlGraphHandle, TRUE);
 	//女の子のリアクション描画
 	if (m_girl_hitReactionFlag == true)				// hitしたならば
 	{
-		DrawGraph(300, m_girl_Y + 450, m_girl_hitReaction_GraphHandle, TRUE);
+		DrawGraph(m_girl_X, m_girl_Y, m_girl_hitReaction_GraphHandle, TRUE);
 	}
 	else if (m_girl_missReactionFlag == true)		// missしたならば
 	{
-		DrawGraph(300, m_girl_Y + 450, m_girl_missReaction_GraphHandle, TRUE);
+		DrawGraph(m_girl_X, m_girl_Y, m_girl_missReaction_GraphHandle, TRUE);
 	}
 	DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);
 	// 目印となる机
@@ -273,11 +304,6 @@ void GameSceneHard::Draw()
 	// プレーヤー
 	m_player->Draw();
 
-	// 終了時
-	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
-	{
-		DrawGraph(0, 0, m_finishGraphHandle, TRUE);							//	最後のエネミーが射出され終わったら"ゲーム終了"の表示
-	}
 	for (int i = 0; i < enemyNum; ++i)
 	{
 		m_score_ui[i]->Draw();
@@ -293,6 +319,11 @@ void GameSceneHard::Draw()
 		m_effect->PlayEffekseer(VGet(0, 20, 0));
 		m_target[m_targetCount]->SetHitIce(false);
 	}
+	// エフェクトの再生(机の的)
+	if (!(m_mark_effect->GetNowPlaying() == 0) && !m_finishFlag)
+	{
+		m_mark_effect->PlayEffekseer(VGet(0, 10, 0));
+	}
 
 	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
 	{
@@ -303,38 +334,71 @@ void GameSceneHard::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	DrawGraph(0, 0, m_manualGraphHandle, TRUE);							//	操作説明を表示
+
+	// 終了時
+	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
+	{
+		DrawGraph(0, 0, m_finishGraphHandle, TRUE);							//	最後のエネミーが射出され終わったら"ゲーム終了"の表示
+	}
+
+		//	フェードイン処理
+	if (m_state == GAME_SCENE_STATE::FADE_IN)
+	{
+		// アルファ値の減算
+		m_alphaVal -= addAlphaVal;
+
+		// アルファブレンド有効化(ここでアルファ値をセット)
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
+
+		// 画面全体に任意のカラーの四角形を描画
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+
+		// アルファブレンド無効化
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		// アルファ値が最大(255)になったらフェードアウト終了
+		if (m_alphaVal <= 0)
+		{
+			m_state = GAME_SCENE_STATE::COUNTDOWN;
+			m_startTime = GetNowCount() / 1000;
+		}
+	}
+	// フェードアウト処理
+	if (m_state == GAME_SCENE_STATE::FADE_OUT)
+	{
+		// アルファ値の加算
+		m_alphaVal += addAlphaVal;
+		// アルファブレンド有効化(ここでアルファ値をセット)
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
+
+		// 画面全体に任意のカラーの四角形を描画
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+
+		// アルファブレンド無効化
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		// アルファ値が最大(255)になったらフェードアウト終了
+		if (m_alphaVal >= 255)
+		{
+			m_fadeOutFinishFlag = true;
+		}
+	}
+
 	// カウントダウンの描画
 	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
 	{
 		int Count = (COUNTDOWN)-(GetNowCount() / 1000 - m_startTime);
 		DrawExtendFormatString(960, 540, 10.0, 10.0, GetColor(255, 0, 0), "%d", Count);
 	}
-
-	/*m_obstructManager->Draw();*/
-	/*DrawString(0, 0, "ゲーム画面です", GetColor(255, 255, 255));*/
-
-	// フェードアウト処理
-	if (m_fadeOutFlag)
-	{
-		for (int i = 0; i < 255; i += FADE_OUT_SPEED)
-		{
-			// 描画輝度をセット
-			SetDrawBright(255 - i, 255 - i, 255 - i);
-
-			// グラフィックを描画
-			DrawGraph(0, 0, m_backGraphHandle, FALSE);
-			DrawGraph(0, 0, m_finishGraphHandle, TRUE);
-			DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
-			DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);
-			ScreenFlip();
-		}
-		m_fadeOutFinishFlag = true;
-
-	}
 }
 
 void GameSceneHard::Sound()
 {
+	if (m_state == GAME_SCENE_STATE::FADE_IN)
+	{
+		PlaySoundMem(m_doorSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal + DOOR_VOLUME_PAL, m_doorSoundHandle);
+	}
 	//	ゲーム終了時に効果音を流す
 	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
@@ -343,7 +407,7 @@ void GameSceneHard::Sound()
 		ChangeVolumeSoundMem(m_volumePal + GONG_VOLUME_PAL, m_finishSoundHandle);
 	}
 	//	ゲーム中にBGMを流す
-	if (m_finishFlag == FALSE)
+	if (m_state == GAME_SCENE_STATE::COUNTDOWN || m_state == GAME_SCENE_STATE::GAME)
 	{
 		PlaySoundMem(m_soundHandle, DX_PLAYTYPE_BACK, FALSE);
 		ChangeVolumeSoundMem(m_volumePal, m_soundHandle);
@@ -352,13 +416,23 @@ void GameSceneHard::Sound()
 
 void GameSceneHard::Load()
 {
+	if (!m_loadFinishFlag)
+	{
+		// フォントサイズをセット
+		SetFontSize(m_loadFontSize);
+		// 画面全体を灰色で描画
+		DrawBox(0, 0, SCREEN_SIZE_W + 1, SCREEN_SIZE_H + 1, GetColor(128, 128, 128), TRUE);
+		// 「読み込み中」の表示
+		DrawString(0, 0, "Now Loading ...", GetColor(255, 255, 255));
+	}
+
 	//	グラフィックハンドルにセット
 	m_finishGraphHandle = LoadGraph("data/img/gameEnd.png");
 	m_backGraphHandle = LoadGraph("data/img/gameBack.png");
 	m_soundHandle = LoadSoundMem("data/sound/gameBgm.ogg");
 	m_finishSoundHandle = LoadSoundMem("data/sound/gameEnd.wav");
 	m_girlGraphHandle = LoadGraph("data/img/chinaGirl.png");
-	m_girl_missReaction_GraphHandle = LoadGraph("data/img/chinaGirl_aseri(01).png");	//  女の子の反応の画像ハンドルをロード
+	m_girl_missReaction_GraphHandle = LoadGraph("data/img/chinaGirl_aseri.png");	//  女の子の反応の画像ハンドルをロード
 	m_girl_hitReaction_GraphHandle = LoadGraph("data/img/chinaGirl_iine.png");			//  女の子の反応の画像ハンドルをロード
 	m_ladyGraphHandle = LoadGraph("data/img/chinaLady.png");
 	m_manualGraphHandle = LoadGraph("data/img/manual.png");
@@ -435,7 +509,10 @@ void GameSceneHard::Load()
 	m_score_ui[0]->Load();
 
 	m_effect = new PlayEffect("data/effects/FeatherBomb.efk", 5.0f);
-
+	m_mark_effect = new PlayEffect("data/effects/DeskMark_2.efk", 5.0f);	//  机の上の的用エフェクト生成
+	// フォントサイズをセット
+	SetFontSize(m_normalFontSize);
+	m_loadFinishFlag = true;
 }
 
 void GameSceneHard::DebugKey()

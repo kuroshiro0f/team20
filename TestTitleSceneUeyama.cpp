@@ -20,12 +20,7 @@ const int SCREEN_SIZE_H = 1080;
 
 const int VOLUME_PAL_SUP = 130;
 
-//	フェードインの速度
-const int FADE_IN_SPEED = 3;
-//	フェードアウトの速度
-const int FADE_OUT_SPEED = 3;
-
-const int addAlphaVal = 1;
+const int addAlphaVal = 5;
 
 
 TestTitleSceneUeyama::TestTitleSceneUeyama()
@@ -172,21 +167,6 @@ SceneBase* TestTitleSceneUeyama::Update(float _deltaTime)
 
 void TestTitleSceneUeyama::Draw()
 {
-	if (!m_fadeInFinishFlag)
-	{
-		// フェードイン処理
-		for (int i = 0; i < 255; i += FADE_IN_SPEED)
-		{
-			// 描画輝度をセット
-			SetDrawBright(i, i, i);
-
-			// グラフィックを描画
-			DrawGraph(0, 0, m_backGraphHandle, TRUE);
-			DrawGraph(0, 0, m_logoGraphHandle, TRUE);
-			ScreenFlip();
-		}
-		m_fadeInFinishFlag = true;
-	}
 	// 透過量更新
 	UpdateTransparent();
 
@@ -240,12 +220,12 @@ void TestTitleSceneUeyama::Draw()
 		{
 			if (i == 0)
 			{
-				DrawExtendFormatString(SCREEN_SIZE_W / 2 - GetFontSize() * 4 * 2, SCREEN_SIZE_H / 2 + (i * 80), 4.0, 4.0, GetColor(255, 255, 255), "イージー");
+				DrawExtendFormatString(SCREEN_SIZE_W / 2 - GetFontSize() * 4 * 2 - 7, SCREEN_SIZE_H / 2 + (i * 80), 4.0, 4.0, GetColor(255, 255, 255), "イージー");
 			}
 
 			if (i == 1)
 			{
-				DrawExtendFormatString(SCREEN_SIZE_W / 2 - GetFontSize() * 4 * 2, SCREEN_SIZE_H / 2 + (i * 80), 4.0, 4.0, GetColor(255, 255, 255), "ノーマル");
+				DrawExtendFormatString(SCREEN_SIZE_W / 2 - GetFontSize() * 4 * 2 - 7, SCREEN_SIZE_H / 2 + (i * 80) - 5, 4.0, 4.0, GetColor(255, 255, 255), "ノーマル");
 			}
 
 			if (i == 2)
@@ -253,7 +233,26 @@ void TestTitleSceneUeyama::Draw()
 				DrawExtendFormatString(SCREEN_SIZE_W / 2 - GetFontSize() * 4 * 1.5, SCREEN_SIZE_H / 2 + (i * 80), 4.0, 4.0, GetColor(255, 255, 255), "ハード");
 			}
 		}
+		if (!m_fadeInFinishFlag)
+		{
+			// アルファ値の減算
+			m_alphaVal -= addAlphaVal;
 
+			// アルファブレンド有効化(ここでアルファ値をセット)
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
+
+			// 画面全体に任意のカラーの四角形を描画
+			DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+
+			// アルファブレンド無効化
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+			// アルファ値が最大(255)になったらフェードアウト終了
+			if (m_alphaVal <= 0)
+			{
+				m_fadeInFinishFlag = true;
+			}
+		}
 		// フェードアウト開始
 		if (m_fadeOutFlag)
 		{

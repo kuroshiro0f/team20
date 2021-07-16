@@ -28,6 +28,10 @@ private:
 	int m_evaluationGraphHandle[3];		//	評価のグラフィックハンドル
 	// 毎透過量
 	int permeationAmount;
+
+	//	アルファ値
+	int m_alphaVal;
+
 	// 透過量
 	int transParent;
 	int m_click_sound_handle;			//	ENTERで進むときのサウンドハンドル
@@ -41,6 +45,7 @@ private:
 	bool m_fadeInFinishFlag;			//	フェードインの終了判定フラグ
 	bool m_fadeOutFlag;					//	フェードアウト開始用のフラグ
 	bool m_fadeOutFinishFlag;			//	フェードアウトの終了判定フラグ
+	bool m_loadFinishFlag;			//	ロードの終了判定フラグ
 };
 
 #endif // _RESULT_H_

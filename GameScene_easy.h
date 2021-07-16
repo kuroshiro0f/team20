@@ -34,10 +34,14 @@ private:
 	class UI* m_score_ui[10];		//  UIクラスへのポインタメンバ変数
 	class UI* m_hit_ui[10];			//	ヒット判定UIクラスへのポインタメンバ変数
 	class PlayEffect* m_effect;     //  エフェクトプレーヤー
+	class PlayEffect* m_mark_effect;//  机につける的のエフェクト
 	GAME_SCENE_STATE m_state;
 	int m_targetCount;				//	アイスの飛ばした個数
 	int m_startTime;				//	ゲームの開始時間
-	int m_girl_Y;					//	
+	int m_girl_X;					//	女の子のポジションY
+	int m_girl_Y;					//	女の子のポジションX
+	int m_girl_moveY;				//  女の子がY座標に動く量
+	int m_girl_moveX;				//  女の子がX座標に動く量
 	int m_lady_Y;
 	int m_backGraphHandle;			//	背景のグラフィックハンドル
 	int m_finishGraphHandle;		//	ゲーム終了文字のグラフィックハンドル
@@ -65,7 +69,7 @@ private:
 	bool m_fadeInFinishFlag;		//	フェードインの終了判定フラグ
 	bool m_fadeOutFlag;				//	フェードアウト開始用のフラグ
 	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
-	bool m_loadFinishFlag;
+	bool m_loadFinishFlag;			//	ロードの終了判定フラグ
 
 	bool m_girl_hitReactionFlag;	//  女の子のhitした時のリアクションをするかどうか
 	bool m_girl_missReactionFlag;	//  女の子のmissした時のアクションをするかどうか
