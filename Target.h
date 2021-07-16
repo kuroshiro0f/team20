@@ -19,7 +19,7 @@ public:
 	Target();				// コンストラクタ.
 	~Target();				// デストラクタ.
 
-	void Update();			// 更新.
+	void Update(float _deltaTime);			// 更新.
 	void Draw();			// 描画.
 	void Reaction(UI* _ui, bool _hitFlag);		// リアクション.
 
@@ -31,8 +31,7 @@ public:
 	// ポジションのgetter/setter.
 	const VECTOR& GetPos() const { return pos; }
 	void SetPos(const VECTOR set) { pos = set; }
-	void SetSinglePosX(){ m_posX = pos.x; }
-
+	void SetSinglePosX() { m_posX = pos.x; }
 	const int GetPosX() { return m_posX; }
 
 	// ディレクションのgetter/setter.
@@ -54,6 +53,8 @@ public:
 	void SetThrowSound(int _sound) { m_throwIceSoundHandle = _sound; }
 	void SetHitSound(int _sound) { m_hitIceSoundHandle = _sound; }
 	void SetMissSound(int _sound) { m_missIceSoundHandle = _sound; }
+	void SetIceType(int _iceType) { m_iceType = _iceType; }
+	int GetIceType() { return m_iceType; }
 
 	void SetHitIce(bool _hitFlag) { m_hitFlag = _hitFlag; }
 	bool GetHitIce() { return m_hitFlag; }
@@ -67,7 +68,7 @@ private:
 	int		modelHandle;	// モデルハンドル.
 	int		m_FontHandle;	// フォントハンドル
 	VECTOR	pos;			// ポジション.
-	int     m_posX;
+	int m_posX;
 
 	VECTOR	velocity;		// 移動力.
 	VECTOR	accelVec;
@@ -86,6 +87,7 @@ private:
 	int		m_plusX;
 	int		m_setTime;
 	int     m_shotInterval;     // エネミーを飛ばす間隔
+	int		m_iceType;
 
 	float m_target_accel;
 

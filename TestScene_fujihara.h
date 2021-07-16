@@ -3,7 +3,7 @@
 #include "SceneBase.h"
 #include "DxLib.h"
 
-class TestScene_fujihara :public SceneBase
+class TestSceneFujihara :public SceneBase
 {
 public:
 
@@ -13,10 +13,10 @@ public:
 		GAME
 	};
 
-	TestScene_fujihara();				//	コンストラクタ
-	~TestScene_fujihara();			//	デストラクタ
+	TestSceneFujihara();				//	コンストラクタ
+	~TestSceneFujihara();			//	デストラクタ
 
-	SceneBase* Update()override;	//	更新
+	SceneBase* Update(float _deltaTime)override;	//	更新
 	void Draw()override;			//	描画
 	void Sound()override;			//	音楽
 	void Load()override;			//	初期化
@@ -32,11 +32,15 @@ private:
 	class UI* m_score_ui[10];		//  UIクラスへのポインタメンバ変数
 	class UI* m_hit_ui[10];			//	ヒット判定UIクラスへのポインタメンバ変数
 	class PlayEffect* m_effect;     //  エフェクトプレーヤー
+	class PlayEffect* m_mark_effect;//  机につける的のエフェクト
 	GAME_SCENE_STATE m_state;
 	int m_targetCount;				//	アイスの飛ばした個数
 	int m_startTime;				//	ゲームの開始時間
-	int m_girl_Y;					//	女の子の画像のy座標
-	int m_lady_Y;					//
+	int m_girl_X;					//	女の子のポジションY
+	int m_girl_Y;					//	女の子のポジションX
+	int m_girl_moveY;				//  女の子がY座標に動く量
+	int m_girl_moveX;				//  女の子がX座標に動く量
+	int m_lady_Y;
 	int m_backGraphHandle;			//	背景のグラフィックハンドル
 	int m_finishGraphHandle;		//	ゲーム終了文字のグラフィックハンドル
 	int m_soundHandle;				//	ゲーム画面・サウンドハンドル
@@ -44,16 +48,21 @@ private:
 	int m_iceSoundHandle;			//	アイスの発射音用サウンドハンドル
 	int m_hitSoundHandle;			//	アイスと皿の衝突音用サウンドハンドル
 	int m_missSoundHandle;			//	アイスと皿が衝突失敗した時の交換用サウンドハンドル
+	int m_doorSoundHandle;			//	入店音のサウンドハンドル
 	int m_manualGraphHandle;		//	操作説明のグラフィックハンドル
-	int m_girlGraphHandle;			//  女の子の画像ハンドル
+	int m_girlGraphHandle;
+	int m_ladyGraphHandle;
 	int m_girl_missReaction_GraphHandle;	//  ミスした時の女の子に追加する画像ハンドル
 	int m_girl_hitReaction_GraphHandle;		//  成功した時の女の子に追加する画像ハンドル
-	int m_ladyGraphHandle;
+	//float m_deltaTime;				//	デルタタイム
 	bool m_checkKeyFlag;			//	キーが押されたままかを判定するフラグ
 	bool m_finishFlag;				//	ゲーム終了判定フラグ
 	bool m_iceThrowFlag;			//	アイス射出フラグ
 	bool m_iceHitFlagBuffer;
-	bool m_girlUpFlag;				//  女の子の画像を上昇させるかどうか
+	bool m_girlUpFlag;
+	bool m_fadeInFinishFlag;		//	フェードインの終了判定フラグ
+	bool m_fadeOutFlag;				//	フェードアウト開始用のフラグ
+	bool m_fadeOutFinishFlag;		//	フェードアウトの終了判定フラグ
 
 	bool m_girl_hitReactionFlag;	//  女の子のhitした時のリアクションをするかどうか
 	bool m_girl_missReactionFlag;	//  女の子のmissした時のアクションをするかどうか

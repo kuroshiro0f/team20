@@ -162,9 +162,12 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Effect.cpp" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameScene_easy.cpp" />
     <ClCompile Include="GameScene_hard.cpp" />
+    <ClCompile Include="GameScene_Lunatic.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GameScene_normal.cpp" />
     <ClCompile Include="HitChecker.cpp" />
     <ClCompile Include="main.cpp" />
@@ -178,6 +181,7 @@
     <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneMgr.cpp" />
     <ClCompile Include="Target.cpp" />
+    <ClCompile Include="TestResultSceneUeyama.cpp" />
     <ClCompile Include="TestSceneKoga.cpp" />
     <ClCompile Include="TestSceneOno.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -189,15 +193,19 @@
     </ClCompile>
     <ClCompile Include="TestScene_fujihara.cpp" />
     <ClCompile Include="TestTitleSceneOno.cpp" />
+    <ClCompile Include="TestTitleSceneUeyama.cpp" />
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Effect.h" />
-    <ClInclude Include="Game.h" />
     <ClInclude Include="GameScene_easy.h" />
     <ClInclude Include="GameScene_hard.h" />
+    <ClInclude Include="GameScene_Lunatic.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="GameScene_normal.h" />
     <ClInclude Include="Hitchecker.h" />
     <ClInclude Include="Mark.h" />
@@ -210,11 +218,13 @@
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneMgr.h" />
     <ClInclude Include="Target.h" />
+    <ClInclude Include="TestResultSceneUeyama.h" />
     <ClInclude Include="TestSceneKoga.h" />
     <ClInclude Include="TestSceneOno.h" />
     <ClInclude Include="TestSceneUeyama.h" />
     <ClInclude Include="TestScene_fujihara.h" />
     <ClInclude Include="TestTitleSceneOno.h" />
+    <ClInclude Include="TestTitleSceneUeyama.h" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="UI.h" />
   </ItemGroup>

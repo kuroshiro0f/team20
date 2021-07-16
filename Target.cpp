@@ -4,6 +4,7 @@
 #include "Hitchecker.h"
 #include "Effect.h"
 #include "UI.h"
+#include <cmath>
 
 // 静的定数.
 const int Target::m_target_X = 400;
@@ -16,14 +17,17 @@ const int Target::m_font_Y = 160;
 const int Target::m_font_size = 50;
 const int Target::m_font_thick = -1;
 
+static const double pi = 3.141592653589793;
 
+// 音量
+const int VOLUME_PAL = 100;
 
 //-----------------------------------------------------------------------------
 // @brief  コンストラクタ.
 //-----------------------------------------------------------------------------
 Target::Target()
 	: modelHandle(-1)
-	, hitRadius(5.0f)
+	, hitRadius(7.5f)
 	, timenow(0)
 	, m_targetCount(0)
 	, m_plusX(0)
@@ -33,6 +37,7 @@ Target::Target()
 	, m_hitFlag(false)
 	, m_throwIceSoundHandle(-1)
 	, m_hitIceSoundHandle(-1)
+	, m_iceType(0)
 {
 	// ３Ｄモデルの読み込み
 	modelHandle = MV1LoadModel("data/model/target/icecream/SVH-icecream/icecream.pmx");
@@ -60,7 +65,7 @@ Target::~Target()
 //-----------------------------------------------------------------------------
 // @brief  更新.
 //-----------------------------------------------------------------------------
-void Target::Update()
+void Target::Update(float _deltaTime)
 {
 	if (m_iceState==END_SHOT)
 	{
@@ -71,19 +76,31 @@ void Target::Update()
 	if (m_iceState == NOW_SHOT)
 	{
 		accelVec = VScale(dir, m_target_accel);
-		
 	}
 	
-
 	// ベロシティ加速計算.
 	velocity = VAdd(velocity, accelVec);
 
-
 	// 上下方向にいかないようにベロシティを整える.
-	velocity = VGet(velocity.x, 0, velocity.z);
+	velocity = VGet(velocity.x * _deltaTime, 0, velocity.z * _deltaTime);
 
 	// ポジションを更新.
 	pos = VAdd(pos, velocity);
+
+	switch (m_iceType)
+	{
+	case 0:
+		break;
+	case 1:
+		pos.z = cos(pos.x / 20.0f) * (pos.x / 5);
+		break;
+	case 2:
+		pos.y = sin(pos.x / 20.0f) * (pos.x / 5);
+		pos.z = cos(pos.x / 20.0f) * (pos.x / 5);
+		break;
+	}
+	//pos.y = sin(pos.x / 20.0f) * (pos.x / 5);
+	//pos.z = cos(pos.x / 20.0f) * (pos.x / 5);
 
 	// 力をかけ終わったベロシティの方向にディレクションを調整.
 	if (VSize(velocity) != 0)
@@ -122,8 +139,8 @@ void Target::Draw()
 	{
 		int timebuffer = GetNowCount() / 1000;
 		
-		//DrawFormatStringToHandle(m_font_X, m_font_Y, GetColor(255, 255, 255),m_FontHandle, "%d"
-			//, (m_shotInterval + 1) - (timebuffer - m_setTime));
+		DrawCircleAA(m_font_X, m_font_Y,((m_shotInterval + 1) - (timebuffer - m_setTime))*30
+			,32, GetColor(255, 255, 255),FALSE);
 	}
 
 	// デバッグあたり判定.
@@ -145,6 +162,7 @@ void Target::Reaction(UI* _ui, bool _hitFlag)
 		ScoreUpdateUI(*_ui, _hitFlag);
 
 		PlaySoundMem(m_hitIceSoundHandle, DX_PLAYTYPE_BACK);
+		ChangeVolumeSoundMem(VOLUME_PAL, m_hitIceSoundHandle);
 
 		// ３Dモデルのポジション設定
 		MV1SetPosition(modelHandle, pos);
@@ -158,6 +176,7 @@ void Target::Reaction(UI* _ui, bool _hitFlag)
 			ScoreUpdateUI(*_ui, _hitFlag);
 
 			PlaySoundMem(m_missIceSoundHandle, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(VOLUME_PAL, m_missIceSoundHandle);
 
 			// ３Dモデルのポジション設定
 			MV1SetPosition(modelHandle, pos);

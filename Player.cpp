@@ -7,7 +7,7 @@
 #include "Effect.h"
 
 // 静的定数.
-const float Player::ACCEL				= 0.3f;		// 通常の加速.
+const float Player::ACCEL				= 500.0f;		// 通常の加速.
 
 //
 int Player::m_sHandle;
@@ -20,12 +20,15 @@ const float Player::GRIP_DECEL			= -0.025f;		// グリップの減速.
 const float Player::GRIP_POWER			= 0.1f;			// グリップ力.
 const float Player::COLIDE_DECEL_FAC	= 0.4f;			// 障害物にぶつかったときの減速率.
 
+//	音量
+const int VOLUME_PAL = 100;
+
 //-----------------------------------------------------------------------------
 // @brief  コンストラクタ.
 //-----------------------------------------------------------------------------
 Player::Player()
 	: modelHandle(-1)
-	 , hitRadius(5.0f)
+	 , hitRadius(7.5f)
 	,m_playerOrbitEfk(nullptr)
 {
 	// サウンドの読み込み
@@ -68,7 +71,7 @@ Player::~Player()
 //-----------------------------------------------------------------------------
 // @brief  更新.
 //-----------------------------------------------------------------------------
-void Player::Update()
+void Player::Update(float _deltaTime)
 {
 	// キー入力取得
 	int Key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
@@ -80,6 +83,7 @@ void Player::Update()
 	if (CheckHitKey(KEY_INPUT_SPACE)&& !KeyPush)
 	{
 		PlaySoundMem(m_sHandle, DX_PLAYTYPE_BACK);
+		ChangeVolumeSoundMem(VOLUME_PAL, m_sHandle);
 		KeyPush = true;
 	}
 
@@ -88,8 +92,8 @@ void Player::Update()
 		accelVec = VScale(dir, ACCEL);
 	}
 
-	// z座標が215を超えたら所定の位置に戻る
-	if (VSize(pos) > VSize(VGet(0, 0, 2150)))
+	// z座標が415を超えたら所定の位置に戻る
+	if (VSize(pos) > VSize(VGet(0, 0, 415)))
 	{
 		// キーが押されていない状態にする
 		KeyPush = false;
@@ -124,7 +128,7 @@ void Player::Update()
 	}
 
 	// 上下方向にいかないようにベロシティを整える.
-	velocity = VGet(velocity.x, 0, velocity.z);
+	velocity = VGet(velocity.x * _deltaTime, 0, velocity.z * _deltaTime);
 
 	// ポジションを更新.
 	pos = VAdd(pos, velocity);
