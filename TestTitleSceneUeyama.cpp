@@ -25,10 +25,13 @@ const int FADE_IN_SPEED = 3;
 //	フェードアウトの速度
 const int FADE_OUT_SPEED = 3;
 
+const int addAlphaVal = 1;
+
 
 TestTitleSceneUeyama::TestTitleSceneUeyama()
 	:m_state(TITLE_TRANS_STATE::FIRST_ENTER)
 	, m_cursolNum(0)
+	, m_alphaVal(0)
 	, m_fadeInFinishFlag(false)
 	, m_fadeOutFlag(false)
 	, m_fadeOutFinishFlag(false)
@@ -42,6 +45,8 @@ TestTitleSceneUeyama::TestTitleSceneUeyama()
 	m_fadeTransVal = FIRST_TRANS_VAL;
 	// 毎透過量変数を１に設定
 	m_permeationAmount = 1;
+
+	SetFontSize(m_normalFontSize);
 }
 
 TestTitleSceneUeyama::~TestTitleSceneUeyama()
@@ -249,21 +254,28 @@ void TestTitleSceneUeyama::Draw()
 			}
 		}
 
-		// フェードアウト処理
+		// フェードアウト開始
 		if (m_fadeOutFlag)
 		{
-			for (int i = 0; i < 255; i += FADE_OUT_SPEED)
-			{
-				// 描画輝度をセット
-				SetDrawBright(255 - i, 255 - i, 255 - i);
+			// アルファ値の加算
+			m_alphaVal += addAlphaVal;
 
-				// グラフィックを描画
-				DrawGraph(0, 0, m_backGraphHandle, FALSE);
-				ScreenFlip();
+			// アルファブレンド有効化(ここでアルファ値をセット)
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
+
+			// 画面全体に任意のカラーの四角形を描画
+			DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+
+			// アルファブレンド無効化
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+			// アルファ値が最大(255)になったらフェードアウト終了
+			if (m_alphaVal >= 255)
+			{
+				m_fadeOutFinishFlag = true;
 			}
-			m_fadeOutFinishFlag = true;
-			
 		}
+
 		break;
 
 	default:

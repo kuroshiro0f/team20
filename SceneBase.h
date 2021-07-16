@@ -16,4 +16,6 @@ public:
 
 protected:
 	int m_volumePal;
+	int m_loadFontSize;
+	int m_normalFontSize;
 };

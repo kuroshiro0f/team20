@@ -15,15 +15,21 @@ static int enemyNum = 10;					//	エネミーの数
 static int GIRL_Y = 0;						//	中華女子の初期Y座標
 static int LADY_Y = 0;						//	中華女性のY座標
 static int GIRL_MIN_Y = -80;				//	中華女子の最小Y座標
-static int COUNTDOWN = 7;					//	カウントダウンの秒数（+2）
+static int COUNTDOWN = 5;					//	カウントダウンの秒数（+2）
 
 ////中華少女の速度
 //static float girlSpeed = 80.0f;
 
+//// ターゲットが飛んでくる間隔 (秒単位)
+//const int TARGET_SHOT_INTERVAL = 2;
 // ターゲットが飛んでくる間隔 (秒単位)
-const int TARGET_SHOT_INTERVAL = 2;
+const int TARGET_SHOT_INTERVAL = 0;
+
+//// ターゲットの速度を初期化
+//static float targetSpeed = 200.0f;
+
 // ターゲットの速度を初期化
-static float targetSpeed = 200.0f;
+static float targetSpeed = 2000.0f;
 
 //	スクリーンのサイズ
 const int SCREEN_SIZE_W = 1920;
@@ -33,6 +39,8 @@ const int SCREEN_SIZE_H = 1080;
 const int FADE_IN_SPEED = 3;
 //	フェードアウトの速度
 const int FADE_OUT_SPEED = 3;
+
+const int addAlphaVal = 5;
 
 // 音量調整
 const int GONG_VOLUME_PAL = 30;
@@ -45,6 +53,7 @@ GameSceneEasy::GameSceneEasy()
 	, m_effect(nullptr)
 	, m_targetCount(0)
 	, m_startTime(0)
+	, m_alphaVal(255)
 	, m_iceThrowFlag(false)
 	, m_iceHitFlagBuffer(false)
 	, m_girl_Y(GIRL_Y)
@@ -53,6 +62,7 @@ GameSceneEasy::GameSceneEasy()
 	, m_fadeInFinishFlag(false)
 	, m_fadeOutFlag(false)
 	, m_fadeOutFinishFlag(false)
+	, m_loadFinishFlag(false)
 	, m_girl_hitReactionFlag(false)
 	, m_girl_missReactionFlag(false)
 	, m_girl_ReactionFlag(false)
@@ -74,7 +84,7 @@ GameSceneEasy::GameSceneEasy()
 	// 開始時のタイムを取得
 	m_startTime = GetNowCount() / 1000;
 	// ステートセット(カウントダウンから)
-	m_state = GAME_SCENE_STATE::COUNTDOWN;
+	m_state = GAME_SCENE_STATE::FADE_IN;
 }
 
 GameSceneEasy::~GameSceneEasy()
@@ -118,6 +128,8 @@ SceneBase* GameSceneEasy::Update(float _deltaTime)
 
 	switch (m_state)
 	{
+	case GAME_SCENE_STATE::FADE_IN:
+		break;
 	case GAME_SCENE_STATE::COUNTDOWN:
 		if ((COUNTDOWN + 1) - (GetNowCount() / 1000 - m_startTime) <= 1)
 		{
@@ -212,6 +224,12 @@ SceneBase* GameSceneEasy::Update(float _deltaTime)
 		{
 			m_fadeOutFlag = true;
 		}
+		if (m_fadeOutFlag)
+		{
+			m_state = GAME_SCENE_STATE::FADE_OUT;
+		}
+		break;
+	case GAME_SCENE_STATE::FADE_OUT:
 		if (m_fadeOutFinishFlag)
 		{
 			// scoreUIのスコアをResultのscore変数にセット
@@ -227,25 +245,6 @@ SceneBase* GameSceneEasy::Update(float _deltaTime)
 
 void GameSceneEasy::Draw()
 {
-	if (!m_fadeInFinishFlag)
-	{
-		// フェードイン処理
-		for (int i = 0; i < 255; i += FADE_IN_SPEED)
-		{
-			// 描画輝度をセット
-			SetDrawBright(i, i, i);
-
-			PlaySoundMem(m_doorSoundHandle, DX_PLAYTYPE_BACK, FALSE);
-			ChangeVolumeSoundMem(m_volumePal + DOOR_VOLUME_PAL, m_doorSoundHandle);
-
-			// グラフィックを描画
-			DrawGraph(0, 0, m_backGraphHandle, TRUE);
-			DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
-			DrawGraph(0, m_lady_Y, m_ladyGraphHandle, TRUE);
-			ScreenFlip();
-		}
-		m_fadeInFinishFlag = true;
-	}
 	//	背景
 	DrawGraph(0, 0, m_backGraphHandle, TRUE);
 	DrawGraph(0, m_girl_Y, m_girlGraphHandle, TRUE);
@@ -300,18 +299,32 @@ void GameSceneEasy::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	DrawGraph(0, 0, m_manualGraphHandle, TRUE);							//	操作説明を表示
-	// カウントダウンの描画
-	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
-	{
-		int Count = (COUNTDOWN)-(GetNowCount() / 1000 - m_startTime);
-		DrawExtendFormatString(960, 540, 10.0, 10.0, GetColor(255, 0, 0), "%d", Count);
-	}
 
 	/*m_obstructManager->Draw();*/
 	/*DrawString(0, 0, "ゲーム画面です", GetColor(255, 255, 255));*/
+	if (m_state == GAME_SCENE_STATE::FADE_IN)
+	{
+		// アルファ値の減算
+		m_alphaVal -= addAlphaVal;
 
+		// アルファブレンド有効化(ここでアルファ値をセット)
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_alphaVal);
+
+		// 画面全体に任意のカラーの四角形を描画
+		DrawBox(0, 0, SCREEN_SIZE_W, SCREEN_SIZE_H, GetColor(0, 0, 0), TRUE);
+
+		// アルファブレンド無効化
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		// アルファ値が最大(255)になったらフェードアウト終了
+		if (m_alphaVal <= 0)
+		{
+			m_state = GAME_SCENE_STATE::COUNTDOWN;
+			m_startTime = GetNowCount() / 1000;
+		}
+	}
 	// フェードアウト処理
-	if (m_fadeOutFlag)
+	if (m_state == GAME_SCENE_STATE::FADE_OUT)
 	{
 		for (int i = 0; i < 255; i += FADE_OUT_SPEED)
 		{
@@ -328,10 +341,21 @@ void GameSceneEasy::Draw()
 		m_fadeOutFinishFlag = true;
 
 	}
+	// カウントダウンの描画
+	if (m_state == GAME_SCENE_STATE::COUNTDOWN)
+	{
+		int Count = (COUNTDOWN)-(GetNowCount() / 1000 - m_startTime);
+		DrawExtendFormatString(960, 540, 10.0, 10.0, GetColor(255, 0, 0), "%d", Count);
+	}
 }
 
 void GameSceneEasy::Sound()
 {
+	if (m_state == GAME_SCENE_STATE::FADE_IN)
+	{
+		PlaySoundMem(m_doorSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+		ChangeVolumeSoundMem(m_volumePal + DOOR_VOLUME_PAL, m_doorSoundHandle);
+	}
 	//	ゲーム終了時に効果音を流す
 	if (m_target[enemyNum - 1]->GetIceState() == Target_State::END_SHOT)
 	{
@@ -340,7 +364,7 @@ void GameSceneEasy::Sound()
 		ChangeVolumeSoundMem(m_volumePal + GONG_VOLUME_PAL, m_finishSoundHandle);
 	}
 	//	ゲーム中にBGMを流す
-	if (m_finishFlag == FALSE)
+	if (m_state == GAME_SCENE_STATE::COUNTDOWN || m_state == GAME_SCENE_STATE::GAME)
 	{
 		PlaySoundMem(m_soundHandle, DX_PLAYTYPE_BACK, FALSE);
 		ChangeVolumeSoundMem(m_volumePal, m_soundHandle);
@@ -349,6 +373,16 @@ void GameSceneEasy::Sound()
 
 void GameSceneEasy::Load()
 {
+	if (!m_loadFinishFlag)
+	{
+		// フォントサイズをセット
+		SetFontSize(m_loadFontSize);
+		// 画面全体を灰色で描画
+		DrawBox(0, 0, SCREEN_SIZE_W + 1, SCREEN_SIZE_H + 1, GetColor(128, 128, 128), TRUE);
+		// 「読み込み中」の表示
+		DrawString(0, 0, "Now Loading ...", GetColor(255, 255, 255));
+	}
+
 	//	グラフィックハンドルにセット
 	m_finishGraphHandle = LoadGraph("data/img/gameEnd.png");
 	m_backGraphHandle = LoadGraph("data/img/gameBack.png");
@@ -393,6 +427,9 @@ void GameSceneEasy::Load()
 	m_score_ui[0]->Load();
 
 	m_effect = new PlayEffect("data/effects/FeatherBomb.efk", 5.0f);
+	// フォントサイズをセット
+	SetFontSize(m_normalFontSize);
+	m_loadFinishFlag = true;
 }
 
 void GameSceneEasy::DebugKey()
