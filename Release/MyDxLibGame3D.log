@@ -1,11 +1,6 @@
-﻿  GameScene_easy.cpp
-C:\Users\takat\Desktop\Git\team20\Target.h(34,37): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
-  GameScene_hard.cpp
-C:\Users\takat\Desktop\Git\team20\Target.h(34,37): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
-  GameScene_normal.cpp
-C:\Users\takat\Desktop\Git\team20\Target.h(34,37): warning C4244: '=': 'float' から 'int' への変換です。データが失われる可能性があります。
+﻿  Result.cpp
   コード生成しています。
-  4 of 143 functions ( 2.8%) were compiled, the rest were copied from previous compilation.
+  1 of 143 functions ( 0.7%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   コード生成が終了しました。

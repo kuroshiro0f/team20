@@ -58,8 +58,7 @@ Result::~Result()
 	}
 	DeleteGraph(m_evaluationGraphHandle[m_evaluation]);
 	DeleteGraph(m_guidanceGraphHandle);
-	/*StopSoundMem(m_bgmSoundHandle);
-	DeleteSoundMem(m_bgmSoundHandle);*/
+	DeleteSoundMem(m_bgmSoundHandle);
 	DeleteSoundMem(m_scoreSoundHandle);
 	DeleteSoundMem(m_numSoundHandle);
 	DeleteSoundMem(m_evaluationSoundHandle[m_evaluation]);
@@ -232,6 +231,8 @@ void Result::Draw()
 
 void Result::Sound()
 {
+	PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_BACK, FALSE);
+	ChangeVolumeSoundMem(m_volumePal + 20, m_bgmSoundHandle);
 	switch (m_checkResultFlag)
 	{
 	case 1:
@@ -240,7 +241,7 @@ void Result::Sound()
 		break;
 	case 2:
 		// アイスが落ちるときの音を流す
-		/*PlaySoundMem(m_numSoundHandle, DX_PLAYTYPE_BACK, TRUE);
+		/*PlaySoundMem(m_numSoundHandle, DX_PLAYTYPE_BACK, FALSE);
 		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_numSoundHandle);*/
 		break;
 	case 3:
@@ -249,8 +250,6 @@ void Result::Sound()
 		ChangeVolumeSoundMem(m_volumePal + VOLUME_PAL_SUP, m_evaluationSoundHandle[m_evaluation]);
 		break;
 	}
-	/*PlaySoundMem(m_bgmSoundHandle, DX_PLAYTYPE_LOOP, TRUE);
-	ChangeVolumeSoundMem(m_volumePal, m_bgmSoundHandle);*/
 }
 
 void Result::Load()
@@ -290,7 +289,7 @@ void Result::Load()
 	m_numGraphHandle[8] = LoadGraph("data/img/result_02_png/Result_01_ice09.png");
 	m_numGraphHandle[9] = LoadGraph("data/img/result_02_png/Result_01_ice10.png");
 	m_numGraphHandle[10] = LoadGraph("data/img/result_02_png/Result_01_ice11.png");
-	//m_bgmSoundHandle = LoadSoundMem("");									//	サウンドハンドルにリザルト画面のBGMをセット
+	m_bgmSoundHandle = LoadSoundMem("data/sound/mura.ogg");									//	サウンドハンドルにリザルト画面のBGMをセット
 	m_scoreSoundHandle = LoadSoundMem("data/sound/score.mp3");				//	サウンドハンドルにリザルト画面の効果音をセット
 	m_numSoundHandle = LoadSoundMem("data/sound/num.mp3");					//	サウンドハンドルにリザルト画面の効果音をセット
 }
